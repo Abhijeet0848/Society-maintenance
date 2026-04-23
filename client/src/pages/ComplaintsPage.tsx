@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { fetchWithAuth } from '../services/api';
 import { GlassCard } from "../components/ui/GlassCard";
 import { 
   MessageSquare, 
@@ -35,7 +36,7 @@ export const ComplaintsPage = () => {
     if (!user._id) return;
     
     try {
-      const res = await fetch(`http://localhost:5000/api/complaints?userId=${user._id}`);
+      const res = await fetchWithAuth(`http://localhost:5000/api/complaints?userId=${user._id}`);
       const data = await res.json();
       if (Array.isArray(data)) setComplaints(data);
     } catch (err) {
@@ -75,7 +76,7 @@ export const ComplaintsPage = () => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     
     try {
-      const res = await fetch('http://localhost:5000/api/complaints', {
+      const res = await fetchWithAuth('http://localhost:5000/api/complaints', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, userId: user._id }),

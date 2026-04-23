@@ -10,6 +10,11 @@ import { ComplaintsPage } from './pages/ComplaintsPage';
 import { FacilitiesPage } from './pages/FacilitiesPage';
 import { DirectoryPage } from './pages/DirectoryPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
+import { NoticesPage } from './pages/NoticesPage';
+import { NotificationsPage } from './pages/NotificationsPage';
+import { AdminRoute } from './components/auth/AdminRoute';
+import { SupportChat } from './components/SupportChat';
+import { AdminMessagesPage } from './pages/AdminMessagesPage';
 import './index.css';
 
 function App() {
@@ -26,7 +31,14 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/dashboard" element={<div className="container pb-20"><DashboardPage /></div>} />
-            <Route path="/admin" element={<div className="container pb-20"><AdminDashboardPage /></div>} />
+            <Route path="/notices" element={<div className="container pb-20"><NoticesPage /></div>} />
+            <Route path="/notifications" element={<div className="container pb-20"><NotificationsPage /></div>} />
+            
+            {/* Secure Admin Section */}
+            <Route element={<AdminRoute />}>
+              <Route path="/admin" element={<div className="container pb-20"><AdminDashboardPage /></div>} />
+            </Route>
+
             <Route path="/profile" element={<div className="container pb-20"><ProfilePage /></div>} />
             <Route path="/maintenance" element={<div className="container pb-20"><MaintenancePage /></div>} />
             <Route path="/complaints" element={<div className="container pb-20"><ComplaintsPage /></div>} />
@@ -41,8 +53,14 @@ function App() {
                   </div>
                </div>
             } />
+            <Route path="/admin/messages" element={
+              <AdminRoute>
+                <AdminMessagesPage />
+              </AdminRoute>
+            } />
           </Routes>
         </main>
+        <SupportChat />
       </div>
     </Router>
   );

@@ -75,7 +75,15 @@ export const RegisterPage = () => {
       });
 
       if (response.ok) {
-        navigate('/login');
+        const { user, token } = await response.json();
+        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('token', token);
+        
+        if (user.role === 'ADMIN') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         const data = await response.json();
         setError(data.message || 'Registration failed. Please try again.');

@@ -6,6 +6,8 @@ const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   role: { type: String, enum: ['ADMIN', 'RESIDENT'], default: 'RESIDENT' },
   flatNo: { type: String },
+  twoFactorEnabled: { type: Boolean, default: false },
+  twoFactorSecret: { type: String },
   createdAt: { type: Date, default: Date.now },
 });
 

@@ -8,6 +8,10 @@ import complaintRoutes from './routes/complaints';
 import billingRoutes from './routes/billing';
 import configRoutes from './routes/config';
 import adminRoutes from './routes/admin';
+import facilityRoutes from './routes/facilities';
+import securityRoutes from './routes/security';
+import notificationRoutes from './routes/notifications';
+import messageRoutes from './routes/messages';
 
 dotenv.config();
 
@@ -24,6 +28,10 @@ app.use('/api/complaints', complaintRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/config', configRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/facilities', facilityRoutes);
+app.use('/api/security', securityRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/messages', messageRoutes);
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/society-maintenance';
 

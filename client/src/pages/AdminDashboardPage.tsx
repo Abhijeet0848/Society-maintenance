@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { fetchWithAuth } from '../services/api';
 import { GlassCard } from "../components/ui/GlassCard";
 import { 
   Users, 
@@ -10,6 +11,9 @@ import {
   ChevronRight,
   Key,
   RefreshCw,
+  Calendar,
+  Clock,
+  ArrowRight,
   Search
 } from 'lucide-react';
 
@@ -19,8 +23,11 @@ export const AdminDashboardPage = () => {
     complaints: 0,
     collection: '0%',
     reserve: '₹ 0k',
-    recentIssues: [] as any[]
+    recentIssues: [] as any[],
+    recentBookings: [] as any[]
   });
+  const [requestingId, setRequestingId] = useState<string | null>(null);
+  const [residentsDues, setResidentsDues] = useState<any[]>([]);
   const [maintenanceValue, setMaintenanceValue] = useState(2500);
   const [adminKey, setAdminKey] = useState('');
   const [loading, setLoading] = useState(false);
@@ -29,37 +36,54 @@ export const AdminDashboardPage = () => {
   const [keyStatus, setKeyStatus] = useState('');
 
   useEffect(() => {
-    // Fetch stats
-    fetch('http://localhost:5000/api/admin/stats')
+    fetchStats();
+    fetchConfig();
+    fetchResidentsDues();
+  }, []);
+
+  const fetchStats = () => {
+    fetchWithAuth('http://localhost:5000/api/admin/stats')
       .then(res => res.json())
       .then(data => {
         if (data && !data.error) setStats(data);
       })
       .catch(err => console.error('Error fetching stats:', err));
+  };
 
-    // Fetch maintenance fee
-    fetch('http://localhost:5000/api/config/maintenance_fee')
+  const fetchResidentsDues = () => {
+    fetchWithAuth('http://localhost:5000/api/admin/residents-dues')
       .then(res => res.json())
       .then(data => {
-        if (data) setMaintenanceValue(data);
+        if (Array.isArray(data)) {
+           console.log('Fetched Dues Data:', data);
+           setResidentsDues(data);
+        }
+      })
+      .catch(err => console.error('Error fetching residents dues:', err));
+  };
+
+  const fetchConfig = () => {
+    fetchWithAuth('http://localhost:5000/api/config/maintenance_fee')
+      .then(res => res.json())
+      .then(data => {
+        if (data && typeof data === 'number') setMaintenanceValue(data);
       })
       .catch(err => console.error('Error fetching maintenance fee:', err));
 
-    // Fetch current admin key
-    fetch('http://localhost:5000/api/config/admin_registration_key')
+    fetchWithAuth('http://localhost:5000/api/config/admin_registration_key')
       .then(res => res.json())
       .then(data => {
         if (data) setAdminKey(data);
         else setAdminKey('SOCIETY2024');
       })
       .catch(err => console.error('Error fetching admin key:', err));
-  }, []);
+  };
 
   const handleUpdateFee = async () => {
     setLoading(true);
     setSaveStatus('');
     try {
-      const response = await fetch('http://localhost:5000/api/config', {
+      const response = await fetchWithAuth('http://localhost:5000/api/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key: 'maintenance_fee', value: maintenanceValue }),
@@ -75,6 +99,74 @@ export const AdminDashboardPage = () => {
     }
   };
 
+  const handleRequestPayment = async (userId: string) => {
+    setRequestingId(userId);
+    const now = new Date();
+    const month = now.toLocaleString('default', { month: 'long' });
+    const year = now.getFullYear();
+
+    console.log(`Requesting payment for ${userId} - ${month} ${year}`);
+
+    try {
+      const response = await fetchWithAuth('http://localhost:5000/api/admin/request-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, amount: maintenanceValue, month, year }),
+      });
+      if (response.ok) {
+        setTimeout(() => {
+            fetchResidentsDues();
+            fetchStats();
+            setRequestingId(null);
+        }, 1000);
+      } else {
+        setRequestingId(null);
+      }
+    } catch (err) {
+      console.error('Failed to request payment:', err);
+      setRequestingId(null);
+    }
+  };
+
+  const [noticeForm, setNoticeForm] = useState({ title: '', content: '', priority: 'Medium' });
+  const [publishing, setPublishing] = useState(false);
+
+  const handlePublishNotice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPublishing(true);
+    try {
+      const response = await fetchWithAuth('http://localhost:5000/api/notices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(noticeForm),
+      });
+      if (response.ok) {
+        setNoticeForm({ title: '', content: '', priority: 'Medium' });
+        alert('Official Notice Published Successfully!');
+        fetchStats();
+      }
+    } catch (err) {
+      console.error('Failed to publish notice:', err);
+    } finally {
+      setPublishing(false);
+    }
+  };
+
+  const handleResolve = async (id: string) => {
+    try {
+      const response = await fetchWithAuth(`http://localhost:5000/api/complaints/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'RESOLVED' }),
+      });
+      if (response.ok) {
+        fetchStats(); 
+      }
+    } catch (err) {
+      console.error('Failed to resolve complaint:', err);
+    }
+  };
+
   const generateAndSaveKey = async () => {
     setKeyLoading(true);
     setKeyStatus('');
@@ -85,7 +177,7 @@ export const AdminDashboardPage = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/config', {
+      const response = await fetchWithAuth('http://localhost:5000/api/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key: 'admin_registration_key', value: newKey }),
@@ -189,6 +281,40 @@ export const AdminDashboardPage = () => {
                 <p className="text-[10px] text-slate-400 font-medium">Updates all future resident invoices automatically.</p>
              </GlassCard>
 
+              <GlassCard className="bg-white border-slate-100 shadow-sm flex flex-col gap-6 p-8">
+                 <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-600 rounded-lg text-white"><MessageSquare size={20} /></div>
+                    <h3 className="font-bold text-lg">Bulletin Broadcast</h3>
+                 </div>
+                 <form onSubmit={handlePublishNotice} className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-2">
+                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Notice Title</label>
+                       <input 
+                         type="text" 
+                         placeholder="e.g. Annual General Meeting" 
+                         className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                         value={noticeForm.title}
+                         onChange={(e) => setNoticeForm({ ...noticeForm, title: e.target.value })}
+                         required
+                       />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Content</label>
+                       <textarea 
+                         rows={2}
+                         placeholder="Detailed announcement details..."
+                         className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl font-medium text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                         value={noticeForm.content}
+                         onChange={(e) => setNoticeForm({ ...noticeForm, content: e.target.value })}
+                         required
+                       />
+                    </div>
+                    <button type="submit" disabled={publishing} className="btn btn-primary w-full py-4 text-[10px] font-black uppercase tracking-widest">
+                       {publishing ? 'Publishing...' : 'Broadcast to Residents'}
+                    </button>
+                 </form>
+              </GlassCard>
+
              <GlassCard className="bg-white border-slate-100 shadow-sm flex flex-col gap-6 p-8">
                 <div className="flex items-center justify-between">
                    <div className="flex items-center gap-3">
@@ -222,6 +348,70 @@ export const AdminDashboardPage = () => {
              </GlassCard>
           </div>
 
+          {/* Maintenance Solicitation Section */}
+          <div className="flex flex-col gap-4">
+             <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold tracking-tight text-slate-900">Revenue Recovery Control</h2>
+                <span className="text-[10px] font-black text-emerald-600 px-3 py-1 bg-emerald-50 rounded-full flex items-center gap-2">
+                   <CreditCard size={12} /> Active Ledger
+                </span>
+             </div>
+             <GlassCard className="p-0 overflow-hidden bg-white border-slate-100 shadow-sm">
+                <div className="flex flex-col divide-y divide-slate-50">
+                   {residentsDues.length > 0 ? residentsDues.map((resident, i) => (
+                     <div key={i} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 hover:bg-slate-50/50 transition-colors gap-4">
+                        <div className="flex items-center gap-4">
+                           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-sm ${resident.billStatus === 'PAID' ? 'bg-emerald-50 text-emerald-600' : resident.billStatus === 'PENDING' ? 'bg-amber-50 text-amber-600' : 'bg-slate-100 text-slate-400'}`}>
+                              {resident.name?.charAt(0) || 'R'}
+                           </div>
+                           <div>
+                              <div className="flex items-center gap-3">
+                                <span className="font-bold text-slate-900">{resident.name}</span>
+                                <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${
+                                    resident.billStatus === 'PAID' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-100' : 
+                                    resident.billStatus === 'PENDING' ? 'bg-amber-600 text-white shadow-lg shadow-amber-100' : 
+                                    'bg-slate-200 text-slate-500'
+                                }`}>
+                                   {resident.billStatus.replace('_', ' ')}
+                                </span>
+                              </div>
+                              <p className="text-xs text-slate-500 font-medium mt-1">Flat {resident.flatNo || 'N/A'} • Monthly Unit: ₹{maintenanceValue}</p>
+                           </div>
+                        </div>
+                        <div className="flex gap-2 w-full sm:w-auto">
+                           {resident.billStatus === 'PAID' ? (
+                               <div className="flex items-center gap-2 text-emerald-600 text-[10px] font-black uppercase tracking-widest bg-emerald-50 px-4 py-2 rounded-xl">
+                                  <ShieldCheck size={14} /> Clear
+                               </div>
+                           ) : (
+                               <button 
+                                 onClick={() => handleRequestPayment(resident._id)}
+                                 disabled={requestingId === resident._id}
+                                 className={`flex items-center gap-2 btn btn-primary text-[10px] py-2 px-6 uppercase tracking-widest font-black shadow-lg shadow-blue-100 transition-all hover:translate-x-1 ${requestingId === resident._id ? 'opacity-50 cursor-wait' : ''}`}
+                               >
+                                  {requestingId === resident._id ? (
+                                     <><RefreshCw size={14} className="animate-spin" /> Working...</>
+                                  ) : resident.billStatus === 'PENDING' ? (
+                                     <><ArrowRight size={14} /> Remind</>
+                                  ) : (
+                                     <><Plus size={14} /> Generate Bill</>
+                                  )}
+                               </button>
+                           )}
+                        </div>
+                     </div>
+                   )) : (
+                     <div className="p-16 text-center flex flex-col items-center gap-4 bg-slate-50/30">
+                        <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center">
+                           <Users size={28} className="text-slate-200" />
+                        </div>
+                        <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">No residents found in ledger</p>
+                     </div>
+                   )}
+                </div>
+             </GlassCard>
+          </div>
+
           <div className="flex flex-col gap-4">
              <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold tracking-tight text-slate-900">Incident Command Center</h2>
@@ -246,8 +436,13 @@ export const AdminDashboardPage = () => {
                            </div>
                         </div>
                         <div className="flex gap-2 w-full sm:w-auto">
-                           <button className="flex-1 sm:flex-none btn bg-white border-slate-200 text-slate-500 text-[10px] py-2 px-4 uppercase tracking-widest font-black">Assign</button>
-                           <button className="flex-1 sm:flex-none btn bg-emerald-600 text-white text-[10px] py-2 px-4 uppercase tracking-widest font-black shadow-lg shadow-emerald-200">Resolve</button>
+                           <button className="flex-1 sm:flex-none btn bg-white border-slate-200 text-slate-500 text-[10px] py-2 px-4 uppercase tracking-widest font-black transition-all hover:bg-slate-50">Assign</button>
+                           <button 
+                             onClick={() => handleResolve(item._id)}
+                             className="flex-1 sm:flex-none btn bg-emerald-600 text-white text-[10px] py-2 px-4 uppercase tracking-widest font-black shadow-lg shadow-emerald-200 transition-all hover:bg-emerald-700 active:scale-95"
+                           >
+                             Resolve
+                           </button>
                         </div>
                      </div>
                    )) : (
@@ -256,6 +451,50 @@ export const AdminDashboardPage = () => {
                            <Search size={28} className="text-slate-200" />
                         </div>
                         <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">No active incidents reported</p>
+                     </div>
+                   )}
+                </div>
+             </GlassCard>
+          </div>
+
+          <div className="flex flex-col gap-4">
+             <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold tracking-tight text-slate-900">Amenity Reservation Desk</h2>
+                <span className="text-[10px] font-black text-emerald-600 px-3 py-1 bg-emerald-50 rounded-full flex items-center gap-2">
+                   <Calendar size={12} /> Active Passes
+                </span>
+             </div>
+             <GlassCard className="p-0 overflow-hidden bg-white border-slate-100 shadow-sm">
+                <div className="flex flex-col divide-y divide-slate-50">
+                   {stats.recentBookings.length > 0 ? stats.recentBookings.map((bk, i) => (
+                     <div key={i} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 hover:bg-slate-50/50 transition-colors gap-4">
+                        <div className="flex items-center gap-4">
+                           <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                              {bk.facilityId?.icon || '🏢'}
+                           </div>
+                           <div>
+                              <div className="flex items-center gap-3">
+                                <span className="font-bold text-slate-900">{bk.facilityId?.name}</span>
+                                <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded bg-emerald-600 text-white shadow-lg shadow-emerald-100`}>Confirmed</span>
+                              </div>
+                              <p className="text-xs text-slate-500 font-medium mt-1">Booked by <span className="text-slate-900 font-bold">{bk.userId?.name || 'Resident'}</span> • Flat {bk.userId?.flatNo || 'N/A'}</p>
+                           </div>
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                           <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                              <Calendar size={12} className="text-blue-500" /> {new Date(bk.bookingDate).toLocaleDateString()}
+                           </div>
+                           <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                              <Clock size={12} className="text-amber-500" /> {bk.timeSlot}
+                           </div>
+                        </div>
+                     </div>
+                   )) : (
+                     <div className="p-16 text-center flex flex-col items-center gap-4 bg-slate-50/30">
+                        <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center">
+                           <Calendar size={28} className="text-slate-200" />
+                        </div>
+                        <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">No active bookings for today</p>
                      </div>
                    )}
                 </div>

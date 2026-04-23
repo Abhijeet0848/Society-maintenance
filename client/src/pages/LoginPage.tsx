@@ -23,8 +23,9 @@ export const LoginPage = () => {
       });
 
       if (response.ok) {
-        const user = await response.json();
+        const { user, token } = await response.json();
         localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('token', token); // Store cryptographic session token
         
         if (user.role === 'ADMIN') {
           navigate('/admin');
@@ -32,6 +33,7 @@ export const LoginPage = () => {
           if (isAdminLogin) {
              setError('Incharge access only.');
              localStorage.removeItem('user');
+             localStorage.removeItem('token');
           } else {
              navigate('/dashboard');
           }

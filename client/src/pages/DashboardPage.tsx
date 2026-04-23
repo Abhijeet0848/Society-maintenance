@@ -15,9 +15,10 @@ import {
   ChevronRight,
   Wallet
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export const DashboardPage = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   
   useEffect(() => {
@@ -40,7 +41,7 @@ export const DashboardPage = () => {
     { name: "Maintenance", icon: CreditCard, path: "/maintenance", color: "bg-blue-500", desc: "Pay dues" },
     { name: "Complaints", icon: MessageSquare, path: "/complaints", color: "bg-amber-500", desc: "Get help" },
     { name: "Facilities", icon: Calendar, path: "/facilities", color: "bg-emerald-500", desc: "Book now" },
-    { name: "Directory", icon: Users, path: "/residents", color: "bg-purple-500", desc: "Search neighbors" },
+    { name: "Directory", icon: Users, path: "/directory", color: "bg-purple-500", desc: "Search neighbors" },
   ];
 
   return (
@@ -59,7 +60,10 @@ export const DashboardPage = () => {
           </p>
         </div>
         <div className="flex gap-3 w-full md:w-auto">
-           <button className="flex-1 md:flex-none btn btn-primary px-8 py-4 shadow-xl shadow-blue-200">
+           <button 
+             onClick={() => navigate('/complaints')}
+             className="flex-1 md:flex-none btn btn-primary px-8 py-4 shadow-xl shadow-blue-200"
+           >
              <PlusCircle size={20} /> Create New Request
            </button>
         </div>
@@ -146,13 +150,19 @@ export const DashboardPage = () => {
                   </Link>
                </GlassCard>
 
-               <GlassCard className="p-6 bg-gradient-to-br from-blue-600 to-blue-800 text-white border-none shadow-blue-200 shadow-2xl">
-                  <h4 className="font-bold text-lg">Need Assistance?</h4>
-                  <p className="text-blue-100 text-sm mt-1 opacity-90">Reach out to the management committee for any emergency help.</p>
-                  <button className="mt-6 w-full py-3 bg-white text-blue-700 font-bold rounded-xl text-sm hover:bg-blue-50 transition-colors">
-                     Contact Committee
-                  </button>
-               </GlassCard>
+               <div className="p-8 bg-gradient-to-br from-blue-700 to-blue-900 text-white border-none shadow-blue-200 shadow-2xl rounded-[3rem] relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700" />
+                  <div className="relative z-10">
+                    <h4 className="font-bold text-xl tracking-tight">Need Assistance?</h4>
+                    <p className="text-white text-sm mt-2 font-medium leading-relaxed">Reach out to the management committee for any emergency help.</p>
+                    <button 
+                       onClick={() => window.dispatchEvent(new CustomEvent('openSupportChat'))}
+                       className="mt-8 w-full py-4 bg-white text-blue-700 font-bold rounded-2xl text-sm hover:translate-y-[-2px] transition-all shadow-xl shadow-black/10 active:scale-95"
+                    >
+                       Contact Committee
+                    </button>
+                  </div>
+               </div>
           </div>
         </div>
       </div>
