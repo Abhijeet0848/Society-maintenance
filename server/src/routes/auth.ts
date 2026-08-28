@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User';
 import SocietyConfig from '../models/SocietyConfig';
 import { authMiddleware, getJwtSecret } from '../middleware/auth';
+import { connectDB } from '../index';
 
 const router = Router();
 
@@ -40,10 +41,15 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    if (mongoose.connection.readyState < 1) {
-      return res.status(503).json({
-        error: 'Database is not connected. Please verify MONGODB_URI in Vercel Environment Variables and MongoDB Atlas Network Access (IP whitelist).',
-      });
+    if (mongoose.connection.readyState !== 1) {
+      try {
+        await connectDB();
+      } catch (dbErr: any) {
+        console.error('Login DB connection failure:', dbErr);
+        return res.status(503).json({
+          error: `Database connection failed (${dbErr?.message || 'Atlas unreachable'}). Please verify MongoDB Atlas IP Whitelist (allow 0.0.0.0/0).`,
+        });
+      }
     }
 
     const user = await User.findOne({ email });

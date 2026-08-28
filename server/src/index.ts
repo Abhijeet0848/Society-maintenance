@@ -120,10 +120,9 @@ const DEFAULT_MONGODB_URI =
   'mongodb+srv://gautamabhijeet050_db_user:XA5pl6w7dkRmP0Rp@cluster1.ph5nmmj.mongodb.net/society-maintenance?retryWrites=true&w=majority&appName=Cluster1';
 const MONGODB_URI = process.env.MONGODB_URI || DEFAULT_MONGODB_URI;
 
-let cachedPromise: Promise<typeof mongoose> | null = null;
-const connectDB = async () => {
-  if (mongoose.connection.readyState >= 1) {
-    return;
+export const connectDB = async () => {
+  if (mongoose.connection.readyState === 1) {
+    return mongoose;
   }
   try {
     dns.setServers(['8.8.8.8', '1.1.1.1']);
@@ -132,7 +131,7 @@ const connectDB = async () => {
   if (!cachedPromise) {
     cachedPromise = mongoose
       .connect(MONGODB_URI, {
-        serverSelectionTimeoutMS: 8000,
+        serverSelectionTimeoutMS: 10000,
         connectTimeoutMS: 10000,
       })
       .then((m) => {
@@ -146,10 +145,10 @@ const connectDB = async () => {
       });
   }
   try {
-    await cachedPromise;
+    return await cachedPromise;
   } catch (err) {
     cachedPromise = null;
-    console.error('MongoDB Atlas connection failed:', err);
+    throw err;
   }
 };
 
