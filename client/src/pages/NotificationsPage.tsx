@@ -18,6 +18,13 @@ export const NotificationsPage = () => {
 
   useEffect(() => {
     if (user._id) fetchNotifications();
+
+    const handleNotificationsUpdated = () => {
+      if (user._id) fetchNotifications();
+    };
+
+    window.addEventListener('notifications-updated', handleNotificationsUpdated);
+    return () => window.removeEventListener('notifications-updated', handleNotificationsUpdated);
   }, [user._id]);
 
   const fetchNotifications = async () => {
@@ -34,12 +41,25 @@ export const NotificationsPage = () => {
 
   const markRead = async (id: string) => {
     try {
+      setNotifications(prev => prev.map(n => n._id === id ? { ...n, read: true } : n));
       await fetchWithAuth(`/api/notifications/read/${id}`, { method: 'PATCH' });
-      fetchNotifications();
+      window.dispatchEvent(new Event('notifications-updated'));
     } catch (err) {
       console.error('Error marking notif read');
     }
   };
+
+  const markAllRead = async () => {
+    try {
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      await fetchWithAuth(`/api/notifications/read-all/${user._id}`, { method: 'PATCH' });
+      window.dispatchEvent(new Event('notifications-updated'));
+    } catch (err) {
+      console.error('Error marking all notifs read');
+    }
+  };
+
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
     <div className="flex flex-col gap-6 sm:gap-10 py-6 sm:py-10 animate-fade-in text-left relative">
@@ -55,6 +75,15 @@ export const NotificationsPage = () => {
           </h1>
           <p className="text-slate-500 font-medium text-sm sm:text-lg mt-0.5 sm:mt-1">Review all your recent interactions and society alerts.</p>
         </div>
+
+        {unreadCount > 0 && (
+          <button
+            onClick={markAllRead}
+            className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-sm"
+          >
+            <CheckCircle2 size={16} /> Mark all as read ({unreadCount})
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-10">
