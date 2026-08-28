@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, User, Building, MapPin, ArrowRight, HardHat, Users, Key, Sparkles } from 'lucide-react';
+import { Mail, Lock, User, Building, MapPin, ArrowRight, HardHat, Users, Key, Sparkles, Eye, EyeOff } from 'lucide-react';
 import { resolveApiUrl } from '../services/api';
 
 export const RegisterPage = () => {
   const [isAdminRegister, setIsAdminRegister] = useState(false);
   const [adminCount, setAdminCount] = useState<number | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showAdminKey, setShowAdminKey] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -202,14 +204,22 @@ export const RegisterPage = () => {
                      <Key className="absolute left-4 text-amber-600 pointer-events-none" size={17} />
                      <input 
                        name="adminKey"
-                       type="password" 
+                       type={showAdminKey ? 'text' : 'password'} 
                        placeholder="••••••••"
                        value={formData.adminKey}
                        onChange={handleChange}
                        autoComplete="new-password"
-                       className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-300 focus:bg-white focus:border-amber-600 focus:ring-4 focus:ring-amber-500/15 rounded-2xl text-slate-900 transition-all font-semibold text-sm outline-none shadow-sm"
+                       className="w-full pl-11 pr-11 py-3.5 bg-white border border-slate-300 focus:bg-white focus:border-amber-600 focus:ring-4 focus:ring-amber-500/15 rounded-2xl text-slate-900 transition-all font-semibold text-sm outline-none shadow-sm"
                        required
                      />
+                     <button
+                       type="button"
+                       onClick={() => setShowAdminKey(!showAdminKey)}
+                       className="absolute right-3.5 text-slate-400 hover:text-slate-700 transition-colors p-1 focus:outline-none"
+                       aria-label={showAdminKey ? "Hide admin key" : "Show admin key"}
+                     >
+                       {showAdminKey ? <EyeOff size={16} /> : <Eye size={16} />}
+                     </button>
                    </div>
                  </div>
                )}
@@ -238,14 +248,22 @@ export const RegisterPage = () => {
                 <Lock className="absolute left-4 text-slate-500 pointer-events-none" size={17} />
                 <input 
                   name="password"
-                  type="password" 
+                  type={showPassword ? 'text' : 'password'} 
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
                   autoComplete="new-password"
-                  className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/15 rounded-2xl text-slate-900 transition-all font-semibold text-sm outline-none shadow-sm"
+                  className="w-full pl-11 pr-11 py-3.5 bg-white border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/15 rounded-2xl text-slate-900 transition-all font-semibold text-sm outline-none shadow-sm"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 text-slate-400 hover:text-slate-700 transition-colors p-1 focus:outline-none"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 
