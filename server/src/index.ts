@@ -116,25 +116,37 @@ app.get('/', (_req, res) => {
 });
 
 // Database connection middleware for Serverless & Standalone
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/society-maintenance';
+const DEFAULT_MONGODB_URI =
+  'mongodb+srv://gautamabhijeet050_db_user:XA5pl6w7dkRmP0Rp@cluster1.ph5nmmj.mongodb.net/society-maintenance?retryWrites=true&w=majority&appName=Cluster1';
+const MONGODB_URI = process.env.MONGODB_URI || DEFAULT_MONGODB_URI;
 
 let cachedPromise: Promise<typeof mongoose> | null = null;
 const connectDB = async () => {
   if (mongoose.connection.readyState >= 1) {
     return;
   }
+  try {
+    dns.setServers(['8.8.8.8', '1.1.1.1']);
+  } catch {}
+
   if (!cachedPromise) {
-    cachedPromise = mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000,
-    }).catch((err) => {
-      cachedPromise = null;
-      console.error('MongoDB Atlas connection error:', err);
-      throw err;
-    });
+    cachedPromise = mongoose
+      .connect(MONGODB_URI, {
+        serverSelectionTimeoutMS: 8000,
+        connectTimeoutMS: 10000,
+      })
+      .then((m) => {
+        console.log('Connected to MongoDB Atlas');
+        return m;
+      })
+      .catch((err) => {
+        cachedPromise = null;
+        console.error('MongoDB Atlas connection error:', err);
+        throw err;
+      });
   }
   try {
     await cachedPromise;
-    console.log('Connected to MongoDB Atlas');
   } catch (err) {
     cachedPromise = null;
     console.error('MongoDB Atlas connection failed:', err);

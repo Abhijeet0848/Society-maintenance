@@ -1,3 +1,9 @@
+import dns from 'dns';
+
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch {}
+
 export default async function handler(req: any, res: any) {
   const origin = req.headers?.origin || '*';
 
