@@ -48,19 +48,19 @@ export const DirectoryPage = () => {
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2 mb-1 sm:mb-2">
              <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-             <p className="text-blue-600 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px] bg-blue-50 py-0.5 sm:py-1 px-2.5 sm:px-3 rounded-full">Community Hub</p>
+             <p className="text-blue-700 font-black uppercase tracking-wider text-[10px] sm:text-xs bg-blue-50 border border-blue-200 py-0.5 sm:py-1 px-2.5 sm:px-3 rounded-full">Community Hub</p>
           </div>
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">
             Resident <span className="text-blue-600">Directory</span>
           </h1>
-          <p className="text-slate-500 font-medium text-sm sm:text-lg mt-0.5 sm:mt-1">Connect and coordinate with verified members of Vrundavan Society.</p>
+          <p className="text-slate-600 font-semibold text-sm sm:text-lg mt-0.5 sm:mt-1">Connect and coordinate with verified members of Vrundavan Society.</p>
         </div>
-        <div className="flex items-center gap-3 bg-white border border-slate-100 p-3 sm:p-4 px-4 sm:px-6 rounded-2xl shadow-sm w-full md:w-auto">
-           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+        <div className="flex items-center gap-3 bg-white border border-slate-200 p-3 sm:p-4 px-4 sm:px-6 rounded-2xl shadow-sm w-full md:w-auto">
+           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold border border-blue-100">
               <Users size={18} />
            </div>
            <div>
-              <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400">Total Families</p>
+              <p className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-500">Total Families</p>
               <p className="text-base sm:text-xl font-extrabold text-slate-900">{residents.length} Active</p>
            </div>
         </div>
@@ -69,9 +69,9 @@ export const DirectoryPage = () => {
       {/* Search & Filter */}
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center w-full">
         <div className="relative w-full sm:flex-1 md:w-[450px]">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
           <input 
-            className="w-full pl-12 pr-4 py-3 sm:py-4 bg-white border border-slate-200 focus:border-blue-500 rounded-2xl shadow-sm outline-none font-medium text-sm transition-all" 
+            className="w-full pl-12 pr-4 py-3 sm:py-4 bg-white border border-slate-300 focus:border-blue-600 rounded-2xl shadow-sm outline-none font-semibold text-slate-900 text-sm placeholder:text-slate-400 transition-all" 
             placeholder="Search by name or flat number (e.g. A-402)..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -90,41 +90,41 @@ export const DirectoryPage = () => {
           {filteredResidents.map((resident, i) => (
             <GlassCard 
                 key={i} 
-                className="flex flex-col gap-4 sm:gap-6 p-5 sm:p-8 border-none shadow-sm hover:shadow-xl hover:translate-y-[-4px] transition-all bg-white group cursor-pointer"
+                className="flex flex-col gap-4 sm:gap-6 p-5 sm:p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:translate-y-[-4px] transition-all bg-white group cursor-pointer rounded-2xl sm:rounded-3xl"
                 onClick={() => {
                     setSelectedResident(resident);
                     setShowModal(true);
                 }}
             >
               <div className="flex justify-between items-start">
-                 <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-lg sm:text-xl capitalize group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                 <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-700 font-extrabold text-lg sm:text-xl capitalize group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 border border-blue-100">
                     {resident.name.charAt(0)}
                  </div>
                  <div className="flex flex-col items-end">
-                    <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-300">Flat No</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Flat No</span>
                     <span className="text-base sm:text-lg font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase">{resident.flatNo}</span>
                  </div>
               </div>
               
               <div className="flex flex-col gap-1">
-                 <h3 className="text-base sm:text-xl font-bold text-slate-900">{resident.name}</h3>
-                 <p className="text-[10px] sm:text-xs font-black text-blue-600/70 uppercase tracking-widest flex items-center gap-1">
-                    <UserCheck size={12} /> Verified Resident
+                 <h3 className="text-base sm:text-xl font-extrabold text-slate-900">{resident.name}</h3>
+                 <p className="text-xs font-bold text-blue-700 uppercase tracking-wider flex items-center gap-1">
+                    <UserCheck size={14} /> Verified Resident
                  </p>
               </div>
 
-              <div className="flex flex-col gap-2 sm:gap-3 pt-3 sm:pt-6 border-t border-slate-50">
-                 <div className="flex items-center gap-2 sm:gap-3 text-slate-400 group-hover:text-slate-600 transition-colors">
-                    <Mail size={14} className="text-blue-500 shrink-0" />
-                    <span className="text-xs font-medium truncate">{resident.email}</span>
+              <div className="flex flex-col gap-2 sm:gap-3 pt-3 sm:pt-6 border-t border-slate-100">
+                 <div className="flex items-center gap-2 sm:gap-3 text-slate-600 group-hover:text-slate-900 transition-colors">
+                    <Mail size={14} className="text-blue-600 shrink-0" />
+                    <span className="text-xs font-semibold truncate">{resident.email}</span>
                  </div>
                  <div className="flex items-center justify-between mt-1 sm:mt-2">
-                    <button className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-blue-600 transition-colors flex items-center gap-1">
-                       View Profile <ChevronRight size={12} />
+                    <button className="text-xs font-black uppercase tracking-wider text-slate-600 group-hover:text-blue-700 transition-colors flex items-center gap-1">
+                       View Profile <ChevronRight size={14} />
                     </button>
                     <div className="flex items-center gap-1.5">
                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                       <span className="text-[9px] sm:text-[10px] font-bold text-emerald-600 uppercase">Live</span>
+                       <span className="text-xs font-extrabold text-emerald-700 uppercase">Live</span>
                     </div>
                  </div>
               </div>
@@ -133,19 +133,19 @@ export const DirectoryPage = () => {
           
           {filteredResidents.length === 0 && (
              <div className="col-span-full py-12 sm:py-20 text-center flex flex-col items-center gap-4">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-slate-50 flex items-center justify-center">
-                   <Search size={28} className="text-slate-300" />
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-slate-50 flex items-center justify-center border border-slate-200">
+                   <Search size={28} className="text-slate-400" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900">No neighbors found</h3>
-                <p className="text-xs sm:text-sm text-slate-500 font-medium">Try searching for a different flat or name.</p>
+                <h3 className="text-lg sm:text-xl font-extrabold text-slate-900">No neighbors found</h3>
+                <p className="text-xs sm:text-sm text-slate-600 font-medium">Try searching for a different flat or name.</p>
              </div>
           )}
         </div>
       ) : (
-        <GlassCard className="p-8 sm:p-20 text-center flex flex-col items-center gap-4 bg-white border-2 border-dashed border-slate-100 shadow-sm rounded-3xl sm:rounded-[3rem]">
-           <Users size={40} className="text-slate-200 sm:w-12 sm:h-12" />
-           <h3 className="text-lg sm:text-2xl font-bold text-slate-900">Directory is currently empty</h3>
-           <p className="text-xs sm:text-sm text-slate-400 font-medium max-w-sm">When neighbors register their accounts, they will appear here automatically.</p>
+        <GlassCard className="p-8 sm:p-20 text-center flex flex-col items-center gap-4 bg-white border-2 border-dashed border-slate-200 shadow-sm rounded-3xl sm:rounded-[3rem]">
+           <Users size={40} className="text-slate-300 sm:w-12 sm:h-12" />
+           <h3 className="text-lg sm:text-2xl font-black text-slate-900">Directory is currently empty</h3>
+           <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-sm">When neighbors register their accounts, they will appear here automatically.</p>
         </GlassCard>
       )}
 
@@ -173,29 +173,29 @@ export const DirectoryPage = () => {
                  <div className="flex flex-col gap-6 sm:gap-8">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 sm:gap-6">
                        <div className="flex flex-col gap-1">
-                          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">{selectedResident.name}</h2>
-                          <p className="text-[9px] sm:text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] flex items-center gap-1.5">
-                             <ShieldCheck size={14} /> Verified Member • Vrundavan Society
+                          <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">{selectedResident.name}</h2>
+                          <p className="text-xs font-bold text-blue-700 uppercase tracking-wider flex items-center gap-1.5">
+                             <ShieldCheck size={16} /> Verified Member • Vrundavan Society
                           </p>
                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
-                       <div className="p-4 sm:p-6 bg-slate-50 rounded-2xl sm:rounded-[2rem] flex flex-col gap-1 border border-slate-100">
-                          <span className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                             <Home size={12} className="text-blue-500" /> Residency
+                       <div className="p-4 sm:p-6 bg-slate-50 rounded-2xl sm:rounded-[2rem] flex flex-col gap-1 border border-slate-200">
+                          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                             <Home size={14} className="text-blue-600" /> Residency
                           </span>
                           <span className="text-lg sm:text-xl font-black text-slate-900 uppercase">Flat {selectedResident.flatNo}</span>
                        </div>
-                       <div className="p-4 sm:p-6 bg-slate-50 rounded-2xl sm:rounded-[2rem] flex flex-col gap-1 border border-slate-100">
-                          <span className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                             <Mail size={12} className="text-blue-500" /> Email
+                       <div className="p-4 sm:p-6 bg-slate-50 rounded-2xl sm:rounded-[2rem] flex flex-col gap-1 border border-slate-200">
+                          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                             <Mail size={14} className="text-blue-600" /> Email
                           </span>
                           <span className="text-xs sm:text-sm font-bold text-slate-900 truncate">{selectedResident.email}</span>
                        </div>
-                       <div className="p-4 sm:p-6 bg-slate-50 rounded-2xl sm:rounded-[2rem] flex flex-col gap-1 border border-slate-100">
-                          <span className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                             <Calendar size={12} className="text-blue-500" /> Member Since
+                       <div className="p-4 sm:p-6 bg-slate-50 rounded-2xl sm:rounded-[2rem] flex flex-col gap-1 border border-slate-200">
+                          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                             <Calendar size={14} className="text-blue-600" /> Member Since
                           </span>
                           <span className="text-xs sm:text-sm font-bold text-slate-900">
                              {new Date(selectedResident.createdAt).toLocaleDateString(undefined, {month: 'long', year: 'numeric'})}
@@ -203,17 +203,17 @@ export const DirectoryPage = () => {
                        </div>
                     </div>
 
-                    <div className="flex flex-col gap-3 sm:gap-4 pt-4 border-t border-slate-50">
-                       <h4 className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-400">Additional Information</h4>
+                    <div className="flex flex-col gap-3 sm:gap-4 pt-4 border-t border-slate-100">
+                       <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Additional Information</h4>
                        <div className="flex flex-wrap gap-2 sm:gap-3">
-                          <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-slate-50 text-slate-500 rounded-full text-[9px] sm:text-[10px] font-bold border border-slate-100 flex items-center gap-1.5">
-                             <UserCheck size={12} /> Registered Resident
+                          <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-slate-50 text-slate-700 rounded-full text-xs font-bold border border-slate-200 flex items-center gap-1.5">
+                             <UserCheck size={14} className="text-emerald-600" /> Registered Resident
                           </div>
-                          <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-slate-50 text-slate-500 rounded-full text-[9px] sm:text-[10px] font-bold border border-slate-100 flex items-center gap-1.5">
-                             <Phone size={12} /> Contact Verified
+                          <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-slate-50 text-slate-700 rounded-full text-xs font-bold border border-slate-200 flex items-center gap-1.5">
+                             <Phone size={14} className="text-blue-600" /> Contact Verified
                           </div>
-                          <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-slate-50 text-slate-500 rounded-full text-[9px] sm:text-[10px] font-bold border border-slate-100 flex items-center gap-1.5">
-                             <MapPin size={12} /> Primary Address
+                          <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-slate-50 text-slate-700 rounded-full text-xs font-bold border border-slate-200 flex items-center gap-1.5">
+                             <MapPin size={14} className="text-amber-600" /> Primary Address
                           </div>
                        </div>
                     </div>

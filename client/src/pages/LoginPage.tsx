@@ -99,46 +99,46 @@ export const LoginPage = () => {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Email Address</label>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-700 ml-1">Email Address</label>
               <div className="relative flex items-center">
-                <Mail className="absolute left-4 text-slate-400 pointer-events-none" size={18} />
+                <Mail className="absolute left-4 text-slate-500 pointer-events-none" size={18} />
                 <input 
                   type="email" 
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl text-slate-900 transition-all font-medium placeholder:text-slate-400 outline-none"
+                  className="w-full pl-12 pr-4 py-4 bg-white border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/15 rounded-2xl text-slate-900 transition-all font-semibold placeholder:text-slate-400 outline-none shadow-sm"
                   required
                 />
               </div>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Password</label>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-700 ml-1">Password</label>
               <div className="relative flex items-center">
-                <Lock className="absolute left-4 text-slate-400 pointer-events-none" size={18} />
+                <Lock className="absolute left-4 text-slate-500 pointer-events-none" size={18} />
                 <input 
                   type="password" 
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 rounded-2xl text-slate-900 transition-all font-medium placeholder:text-slate-400 outline-none"
+                  className="w-full pl-12 pr-4 py-4 bg-white border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/15 rounded-2xl text-slate-900 transition-all font-semibold placeholder:text-slate-400 outline-none shadow-sm"
                   required
                 />
               </div>
             </div>
 
             <div className="flex justify-between items-center text-xs font-medium px-1 mt-1">
-              <label className="flex items-center gap-2 cursor-pointer text-slate-500 hover:text-slate-900 transition-colors">
+              <label className="flex items-center gap-2 cursor-pointer text-slate-700 hover:text-slate-900 font-semibold transition-colors">
                 <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer" />
                 Keep me logged in
               </label>
-              <Link to="#" className={`${isAdminLogin ? 'text-amber-600' : 'text-blue-600'} font-bold hover:underline`}>Forgot password?</Link>
+              <Link to="#" className={`${isAdminLogin ? 'text-amber-700' : 'text-blue-700'} font-bold hover:underline`}>Forgot password?</Link>
             </div>
 
             <button 
               type="submit" 
-              className={`w-full py-4 mt-2 text-sm font-bold uppercase tracking-widest rounded-2xl shadow-xl transition-all duration-300 flex gap-3 items-center justify-center outline-none ${isAdminLogin ? 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/20 text-white' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-600/20 text-white'}`} 
+              className={`w-full py-4 mt-2 text-sm font-black uppercase tracking-wider rounded-2xl shadow-xl transition-all duration-300 flex gap-3 items-center justify-center outline-none active:scale-95 ${isAdminLogin ? 'bg-amber-600 hover:bg-amber-700 shadow-amber-500/20 text-white' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-600/25 text-white'}`} 
               disabled={loading}
             >
               {loading ? 'Authenticating...' : 'Sign In To Portal'}
@@ -149,7 +149,7 @@ export const LoginPage = () => {
 
         {/* Footer Link */}
         <div className="text-center mt-8">
-          <p className="text-sm text-slate-500 font-medium">
+          <p className="text-sm text-slate-600 font-semibold">
             New to Vrundavan Society? <Link to="/register" className="text-blue-600 font-bold hover:underline">Register your flat</Link>
           </p>
         </div>

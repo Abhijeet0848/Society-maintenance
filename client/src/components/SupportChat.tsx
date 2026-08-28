@@ -85,53 +85,53 @@ export const SupportChat = () => {
   return (
     <div className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-[1000] flex flex-col items-end gap-3 sm:gap-4 max-w-[100vw]">
       {isOpen && (
-        <GlassCard className="w-[calc(100vw-2rem)] sm:w-[380px] max-w-sm h-[480px] max-h-[80vh] bg-white border-slate-100 shadow-2xl rounded-3xl sm:rounded-[2.5rem] flex flex-col p-0 overflow-hidden animate-slide-up">
+        <GlassCard className="w-[calc(100vw-2rem)] sm:w-[380px] max-w-sm h-[480px] max-h-[80vh] bg-white border border-slate-200 shadow-2xl rounded-3xl sm:rounded-[2.5rem] flex flex-col p-0 overflow-hidden animate-slide-up">
            <div className="bg-blue-600 p-4 sm:p-6 text-white flex justify-between items-center">
               <div className="flex items-center gap-3">
-                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center">
                     <Shield size={18} />
                  </div>
                  <div>
-                    <h4 className="font-bold text-sm">Society Helpdesk</h4>
-                    <p className="text-[10px] text-blue-100 font-bold uppercase tracking-widest">Office Representative</p>
+                    <h4 className="font-extrabold text-sm text-white">Society Helpdesk</h4>
+                    <p className="text-xs text-blue-100 font-bold uppercase tracking-wider">Office Representative</p>
                  </div>
               </div>
-              <button onClick={() => setIsOpen(false)} className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center">
+              <button onClick={() => setIsOpen(false)} className="w-8 h-8 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors">
                  <X size={18} />
               </button>
            </div>
 
-           <div ref={chatRef} className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col gap-3 sm:gap-4 bg-slate-50/50">
+           <div ref={chatRef} className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col gap-3 sm:gap-4 bg-slate-50">
               {messages.length > 0 ? messages.map((m, i) => (
                 <div key={i} className={`flex ${m.senderId === user._id ? 'justify-end' : 'justify-start'}`}>
                    <div className={`max-w-[85%] sm:max-w-[80%] p-3.5 sm:p-4 rounded-2xl text-xs sm:text-sm ${
                       m.senderId === user._id 
-                        ? 'bg-blue-600 text-white rounded-tr-none shadow-lg shadow-blue-100' 
-                        : 'bg-white text-slate-700 border border-slate-100 rounded-tl-none shadow-sm'
+                        ? 'bg-blue-600 text-white rounded-tr-none shadow-md font-semibold' 
+                        : 'bg-white text-slate-900 border border-slate-200 rounded-tl-none shadow-sm font-semibold'
                    }`}>
-                      <p className="font-medium leading-relaxed">{m.content}</p>
-                      <div className={`text-[9px] mt-1.5 font-bold uppercase tracking-widest ${m.senderId === user._id ? 'text-blue-200' : 'text-slate-300'}`}>
-                         <Clock size={10} className="inline mr-1" /> {new Date(m.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      <p className="leading-relaxed">{m.content}</p>
+                      <div className={`text-[10px] mt-1.5 font-bold uppercase tracking-wider ${m.senderId === user._id ? 'text-blue-100' : 'text-slate-500'}`}>
+                         <Clock size={11} className="inline mr-1" /> {new Date(m.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                       </div>
                    </div>
                 </div>
               )) : (
                 <div className="flex-1 flex flex-col items-center justify-center text-center p-6 sm:p-10 gap-3">
-                   <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white shadow-sm flex items-center justify-center opacity-40">
+                   <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400">
                       <MessageSquare size={28} />
                    </div>
-                   <p className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
+                   <p className="text-xs font-bold text-slate-600 uppercase tracking-wider leading-relaxed">
                       Start a direct chat with the management office for any queries.
                    </p>
                 </div>
               )}
            </div>
 
-           <form onSubmit={handleSend} className="p-3 sm:p-4 bg-white border-t border-slate-50 flex gap-2 sm:gap-3">
+           <form onSubmit={handleSend} className="p-3 sm:p-4 bg-white border-t border-slate-200 flex gap-2 sm:gap-3">
               <input 
                 type="text" 
                 placeholder="Type your message..."
-                className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-100 rounded-xl text-xs sm:text-sm font-medium outline-none focus:bg-white focus:border-blue-500 transition-all"
+                className="flex-1 px-3.5 sm:px-4 py-2.5 sm:py-3 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 outline-none focus:border-blue-600 transition-all placeholder:text-slate-400 shadow-sm"
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
               />

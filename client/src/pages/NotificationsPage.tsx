@@ -70,55 +70,55 @@ export const NotificationsPage = () => {
                  {notifications.map((notif, i) => (
                     <GlassCard 
                         key={i} 
-                        className={`p-4 sm:p-8 border-none shadow-sm hover:shadow-lg transition-all cursor-pointer group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-6 rounded-2xl sm:rounded-3xl ${!notif.read ? 'bg-white' : 'bg-slate-50/50'}`}
+                        className={`p-4 sm:p-8 border shadow-sm hover:shadow-lg transition-all cursor-pointer group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-6 rounded-2xl sm:rounded-3xl ${!notif.read ? 'bg-white border-blue-200' : 'bg-slate-50/80 border-slate-200'}`}
                         onClick={() => !notif.read && markRead(notif._id)}
                     >
                        <div className="flex items-start sm:items-center gap-3 sm:gap-6">
                             <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 shadow-sm ${
-                                notif.type === 'SUCCESS' ? 'bg-emerald-500 text-white' : 
-                                notif.type === 'WARNING' ? 'bg-amber-500 text-white' : 'bg-blue-600 text-white'
+                                notif.type === 'SUCCESS' ? 'bg-emerald-600 text-white' : 
+                                notif.type === 'WARNING' ? 'bg-amber-600 text-white' : 'bg-blue-600 text-white'
                             }`}>
                                 {notif.type === 'SUCCESS' ? <CheckCircle2 size={18} className="sm:w-6 sm:h-6" /> : 
                                     notif.type === 'WARNING' ? <AlertTriangle size={18} className="sm:w-6 sm:h-6" /> : <Info size={18} className="sm:w-6 sm:h-6" />}
                             </div>
                             <div className="flex flex-col gap-0.5 sm:gap-1">
                                 <div className="flex flex-wrap items-center gap-2">
-                                    <h3 className={`text-sm sm:text-base font-bold ${!notif.read ? 'text-slate-900' : 'text-slate-500'}`}>{notif.title}</h3>
-                                    {!notif.read && <span className="px-2 py-0.5 bg-blue-600 text-white text-[8px] font-black uppercase tracking-widest rounded-full animate-pulse">New</span>}
+                                    <h3 className={`text-sm sm:text-base font-extrabold ${!notif.read ? 'text-slate-900' : 'text-slate-700'}`}>{notif.title}</h3>
+                                    {!notif.read && <span className="px-2 py-0.5 bg-blue-600 text-white text-[9px] font-black uppercase tracking-wider rounded-full animate-pulse">New</span>}
                                 </div>
-                                <p className="text-xs sm:text-sm font-medium text-slate-500 leading-relaxed max-w-xl">{notif.message}</p>
+                                <p className="text-xs sm:text-sm font-semibold text-slate-600 leading-relaxed max-w-xl">{notif.message}</p>
                             </div>
                        </div>
-                       <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-1 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-50">
-                          <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1">
-                             <Clock size={11} className="text-blue-500" /> {new Date(notif.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                       <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-1 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200">
+                          <p className="text-[10px] sm:text-xs font-black text-slate-600 uppercase tracking-wider flex items-center gap-1">
+                             <Clock size={12} className="text-blue-600" /> {new Date(notif.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                           </p>
-                          <p className="text-[9px] sm:text-[10px] font-bold text-slate-300 uppercase">{new Date(notif.createdAt).toLocaleDateString()}</p>
+                          <p className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase">{new Date(notif.createdAt).toLocaleDateString()}</p>
                        </div>
                     </GlassCard>
                  ))}
               </div>
            ) : (
-              <div className="py-16 sm:py-32 text-center flex flex-col items-center gap-4 sm:gap-6 bg-slate-50/30 border-2 border-dashed border-slate-100 rounded-3xl sm:rounded-[3rem]">
-                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-200">
+              <div className="py-16 sm:py-32 text-center flex flex-col items-center gap-4 sm:gap-6 bg-white border-2 border-dashed border-slate-200 rounded-3xl sm:rounded-[3rem]">
+                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-slate-50 shadow-sm flex items-center justify-center text-slate-400">
                     <Bell size={32} className="sm:w-10 sm:h-10" />
                  </div>
-                 <p className="text-slate-400 font-bold text-xs uppercase tracking-widest">No activity found in your logs</p>
+                 <p className="text-slate-600 font-bold text-xs uppercase tracking-wider">No activity found in your logs</p>
               </div>
            )}
         </div>
 
         <div className="flex flex-col gap-4 sm:gap-8">
            <div className="flex flex-col gap-3 sm:gap-4">
-              <h2 className="text-xs sm:text-sm font-black uppercase tracking-widest text-slate-400 px-1">Refine Activity</h2>
-              <GlassCard className="bg-white border-slate-100 p-4 sm:p-6 flex flex-col gap-3 sm:gap-4 shadow-sm rounded-2xl sm:rounded-3xl">
+              <h2 className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-500 px-1">Refine Activity</h2>
+              <GlassCard className="bg-white border-slate-200 p-4 sm:p-6 flex flex-col gap-3 sm:gap-4 shadow-sm rounded-2xl sm:rounded-3xl">
                  <div className="flex flex-col gap-2">
-                    <button className="flex items-center justify-between p-3 sm:p-3.5 bg-blue-50 text-blue-600 rounded-xl sm:rounded-2xl text-xs font-bold">
-                       <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest">All Events</span>
+                    <button className="flex items-center justify-between p-3 sm:p-3.5 bg-blue-50 text-blue-700 rounded-xl sm:rounded-2xl text-xs font-bold border border-blue-200">
+                       <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider">All Events</span>
                        <Filter size={14} />
                     </button>
-                    <button className="flex items-center justify-between p-3 sm:p-3.5 bg-white text-slate-400 rounded-xl sm:rounded-2xl hover:bg-slate-50 transition-all text-xs font-bold">
-                       <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest">Security Only</span>
+                    <button className="flex items-center justify-between p-3 sm:p-3.5 bg-white text-slate-600 rounded-xl sm:rounded-2xl hover:bg-slate-50 border border-slate-200 transition-all text-xs font-bold">
+                       <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider">Security Only</span>
                        <ShieldCheck size={14} />
                     </button>
                  </div>

@@ -160,16 +160,16 @@ export const RegisterPage = () => {
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div className={`grid grid-cols-1 ${showKeyField ? 'sm:grid-cols-2' : ''} gap-5`}>
                <div className="flex flex-col gap-2">
-                 <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Full Name</label>
+                 <label className="text-xs font-bold uppercase tracking-wider text-slate-700 ml-1">Full Name</label>
                  <div className="relative flex items-center">
-                   <User className="absolute left-4 text-slate-400 pointer-events-none" size={17} />
+                   <User className="absolute left-4 text-slate-500 pointer-events-none" size={17} />
                    <input 
                      name="name"
                      type="text" 
                      placeholder="John Doe"
                      value={formData.name}
                      onChange={handleChange}
-                     className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 rounded-2xl text-slate-900 transition-all font-medium text-sm outline-none"
+                     className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/15 rounded-2xl text-slate-900 transition-all font-semibold text-sm outline-none shadow-sm"
                      required
                    />
                  </div>
@@ -177,16 +177,16 @@ export const RegisterPage = () => {
 
                {!isAdminRegister && (
                  <div className="flex flex-col gap-2">
-                   <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Flat Number</label>
+                   <label className="text-xs font-bold uppercase tracking-wider text-slate-700 ml-1">Flat Number</label>
                    <div className="relative flex items-center">
-                     <MapPin className="absolute left-4 text-slate-400 pointer-events-none" size={17} />
+                     <MapPin className="absolute left-4 text-slate-500 pointer-events-none" size={17} />
                      <input 
                        name="flatNo"
                        type="text" 
                        placeholder="A-402"
                        value={formData.flatNo}
                        onChange={handleChange}
-                       className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 rounded-2xl text-slate-900 transition-all font-medium text-sm outline-none"
+                       className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/15 rounded-2xl text-slate-900 transition-all font-semibold text-sm outline-none shadow-sm"
                        required
                      />
                    </div>
@@ -195,16 +195,16 @@ export const RegisterPage = () => {
 
                {showKeyField && (
                  <div className="flex flex-col gap-2">
-                   <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Admin Key</label>
+                   <label className="text-xs font-bold uppercase tracking-wider text-slate-700 ml-1">Admin Key</label>
                    <div className="relative flex items-center">
-                     <Key className="absolute left-4 text-amber-500 pointer-events-none" size={17} />
+                     <Key className="absolute left-4 text-amber-600 pointer-events-none" size={17} />
                      <input 
                        name="adminKey"
                        type="password" 
                        placeholder="••••••••"
                        value={formData.adminKey}
                        onChange={handleChange}
-                       className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 focus:bg-white focus:border-amber-500 rounded-2xl text-slate-900 transition-all font-medium text-sm outline-none"
+                       className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-300 focus:bg-white focus:border-amber-600 focus:ring-4 focus:ring-amber-500/15 rounded-2xl text-slate-900 transition-all font-semibold text-sm outline-none shadow-sm"
                        required
                      />
                    </div>
@@ -213,32 +213,32 @@ export const RegisterPage = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Email Address</label>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-700 ml-1">Email Address</label>
               <div className="relative flex items-center">
-                <Mail className="absolute left-4 text-slate-400 pointer-events-none" size={17} />
+                <Mail className="absolute left-4 text-slate-500 pointer-events-none" size={17} />
                 <input 
                   name="email"
                   type="email" 
                   placeholder="name@example.com"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 rounded-2xl text-slate-900 transition-all font-medium text-sm outline-none"
+                  className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/15 rounded-2xl text-slate-900 transition-all font-semibold text-sm outline-none shadow-sm"
                   required
                 />
               </div>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Create Password</label>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-700 ml-1">Create Password</label>
               <div className="relative flex items-center">
-                <Lock className="absolute left-4 text-slate-400 pointer-events-none" size={17} />
+                <Lock className="absolute left-4 text-slate-500 pointer-events-none" size={17} />
                 <input 
                   name="password"
                   type="password" 
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 rounded-2xl text-slate-900 transition-all font-medium text-sm outline-none"
+                  className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/15 rounded-2xl text-slate-900 transition-all font-semibold text-sm outline-none shadow-sm"
                   required
                 />
               </div>
@@ -246,7 +246,7 @@ export const RegisterPage = () => {
 
             <button 
               type="submit" 
-              className={`w-full py-4 mt-4 text-sm font-black uppercase tracking-widest rounded-2xl shadow-xl transition-all duration-300 flex gap-3 items-center justify-center outline-none ${isAdminRegister ? 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/20 text-white' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-600/20 text-white'}`} 
+              className={`w-full py-4 mt-4 text-sm font-black uppercase tracking-wider rounded-2xl shadow-xl transition-all duration-300 flex gap-3 items-center justify-center outline-none active:scale-95 ${isAdminRegister ? 'bg-amber-600 hover:bg-amber-700 shadow-amber-500/25 text-white' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-600/25 text-white'}`} 
               disabled={loading}
             >
               {loading ? 'Processing...' : (isAdminRegister && adminCount === 0 ? 'Initialize Admin Account' : `Register as ${isAdminRegister ? 'Incharge' : 'Resident'}`)}
@@ -257,7 +257,7 @@ export const RegisterPage = () => {
 
         {/* Footer Link */}
         <div className="text-center mt-8">
-          <p className="text-sm text-slate-500 font-medium">
+          <p className="text-sm text-slate-600 font-semibold">
             Already have an account? <Link to="/login" className="text-blue-600 font-bold hover:underline">Sign in here</Link>
           </p>
         </div>
