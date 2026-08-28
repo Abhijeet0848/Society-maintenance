@@ -41,8 +41,8 @@ export const LoginPage = () => {
           }
         }
       } else {
-        const data = await response.json();
-        setError(data.message || 'Login failed.');
+        const data = await response.json().catch(() => ({}));
+        setError(data.error || data.message || 'Invalid email or password.');
       }
     } catch (err) {
       setError('Connection failed. Please try again.');

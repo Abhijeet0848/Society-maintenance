@@ -88,8 +88,8 @@ export const RegisterPage = () => {
           navigate('/dashboard');
         }
       } else {
-        const data = await response.json();
-        setError(data.message || 'Registration failed. Please try again.');
+        const data = await response.json().catch(() => ({}));
+        setError(data.error || data.message || 'Registration failed. Please try again.');
       }
     } catch (err) {
       setError('Connection to server failed. Please try again.');
