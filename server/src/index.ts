@@ -102,9 +102,13 @@ app.use('/api/auth/register', authLimiter);
 
 app.use(express.json({ limit: '1mb' }));
 
-// Health check endpoint
+// Health check endpoint (Instant, no DB dependency)
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'ok', 
+    dbConnected: mongoose.connection.readyState === 1,
+    timestamp: new Date().toISOString() 
+  });
 });
 
 // Root API Welcome endpoint
@@ -115,23 +119,30 @@ app.get('/', (_req, res) => {
 // Database connection middleware for Serverless & Standalone
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/society-maintenance';
 
-let isConnected = false;
+let cachedPromise: Promise<typeof mongoose> | null = null;
 const connectDB = async () => {
-  if (isConnected || mongoose.connection.readyState >= 1) {
+  if (mongoose.connection.readyState >= 1) {
     return;
   }
-  try {
-    await mongoose.connect(MONGODB_URI, {
+  if (!cachedPromise) {
+    cachedPromise = mongoose.connect(MONGODB_URI, {
       serverSelectionTimeoutMS: 5000,
+    }).catch((err) => {
+      cachedPromise = null;
+      console.error('MongoDB Atlas connection error:', err);
+      throw err;
     });
-    isConnected = true;
+  }
+  try {
+    await cachedPromise;
     console.log('Connected to MongoDB Atlas');
   } catch (err) {
-    console.error('MongoDB Atlas connection error:', err);
+    cachedPromise = null;
+    console.error('MongoDB Atlas connection failed:', err);
   }
 };
 
-// Ensure DB is connected on each serverless request
+// Ensure DB connection is initiated on API requests
 app.use(async (_req, _res, next) => {
   try {
     await connectDB();
@@ -162,8 +173,9 @@ if (fs.existsSync(clientDistPath)) {
   });
 }
 
-// Standalone Server Start (When not running on Vercel Serverless)
-if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+// Standalone Server Start (When not running in Vercel Serverless environment)
+const isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+if (!isServerless) {
   connectDB().then(() => {
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
@@ -172,3 +184,4 @@ if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
 }
 
 export default app;
+
