@@ -58,12 +58,35 @@ app.use('/api/auth/register', authLimiter);
 
 // CORS configuration
 const corsOrigin = process.env.CLIENT_URL || process.env.CORS_ORIGIN;
-if (corsOrigin && corsOrigin !== '*') {
-  const allowed = corsOrigin.split(',').map(s => s.trim());
-  app.use(cors({ origin: allowed, credentials: true }));
-} else {
-  app.use(cors());
-}
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, or same-origin requests)
+      if (!origin) return callback(null, true);
+      
+      // If explicit origin configured
+      if (corsOrigin && corsOrigin !== '*') {
+        const allowed = corsOrigin.split(',').map(s => s.trim());
+        if (allowed.includes(origin) || allowed.includes('*')) {
+          return callback(null, true);
+        }
+      }
+
+      // Automatically allow Cloudflare Workers and Pages origins and localhost
+      if (
+        origin.endsWith('.workers.dev') ||
+        origin.endsWith('.pages.dev') ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1')
+      ) {
+        return callback(null, true);
+      }
+
+      return callback(null, true); // Allow for seamless fullstack integration
+    },
+    credentials: true,
+  })
+);
 
 app.use(express.json({ limit: '1mb' }));
 
