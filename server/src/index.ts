@@ -8,7 +8,11 @@ import path from 'path';
 import fs from 'fs';
 import dns from 'dns';
 
-dns.setServers(['8.8.8.8', '1.1.1.1']);
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch {
+  // Ignore DNS override errors on restricted environments
+}
 
 dotenv.config();
 
@@ -26,7 +30,46 @@ import messageRoutes from './routes/messages';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Security HTTP Headers
+// Trust proxy for rate limiting on Vercel/reverse proxy
+app.set('trust proxy', 1);
+
+// 1. CORS configuration (Always first to handle preflights cleanly)
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (curl, mobile apps, server-to-server)
+    if (!origin) return callback(null, true);
+
+    const corsOrigin = process.env.CLIENT_URL || process.env.CORS_ORIGIN;
+    if (corsOrigin) {
+      const allowed = corsOrigin.split(',').map(s => s.trim());
+      if (allowed.includes(origin) || allowed.includes('*')) {
+        return callback(null, true);
+      }
+    }
+
+    if (
+      origin.endsWith('.workers.dev') ||
+      origin.endsWith('.pages.dev') ||
+      origin.endsWith('.vercel.app') ||
+      origin.includes('localhost') ||
+      origin.includes('127.0.0.1')
+    ) {
+      return callback(null, true);
+    }
+
+    // Default allow all origins to prevent unexpected CORS blocks
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
+// 2. Security HTTP Headers
 app.use(
   helmet({
     contentSecurityPolicy: false,
@@ -34,57 +77,28 @@ app.use(
   })
 );
 
-// Global Rate Limiting
+// 3. Rate Limiting (Skip preflight OPTIONS requests)
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 300,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => req.method === 'OPTIONS',
   message: { error: 'Too many requests from this IP, please try again after 15 minutes.' },
 });
 
-// Strict Auth Rate Limiter
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 30,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => req.method === 'OPTIONS',
   message: { error: 'Too many authentication attempts. Please try again after 15 minutes.' },
 });
 
 app.use('/api/', apiLimiter);
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
-
-// CORS configuration (Allows Cloudflare frontend and custom domains)
-const corsOrigin = process.env.CLIENT_URL || process.env.CORS_ORIGIN;
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      
-      if (corsOrigin && corsOrigin !== '*') {
-        const allowed = corsOrigin.split(',').map(s => s.trim());
-        if (allowed.includes(origin) || allowed.includes('*')) {
-          return callback(null, true);
-        }
-      }
-
-      if (
-        origin.endsWith('.workers.dev') ||
-        origin.endsWith('.pages.dev') ||
-        origin.endsWith('.vercel.app') ||
-        origin.includes('localhost') ||
-        origin.includes('127.0.0.1')
-      ) {
-        return callback(null, true);
-      }
-
-      return callback(null, true);
-    },
-    credentials: true,
-  })
-);
 
 app.use(express.json({ limit: '1mb' }));
 
@@ -107,7 +121,9 @@ const connectDB = async () => {
     return;
   }
   try {
-    await mongoose.connect(MONGODB_URI);
+    await mongoose.connect(MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000,
+    });
     isConnected = true;
     console.log('Connected to MongoDB Atlas');
   } catch (err) {
@@ -117,7 +133,11 @@ const connectDB = async () => {
 
 // Ensure DB is connected on each serverless request
 app.use(async (_req, _res, next) => {
-  await connectDB();
+  try {
+    await connectDB();
+  } catch (err) {
+    console.error('Database connection middleware error:', err);
+  }
   next();
 });
 
