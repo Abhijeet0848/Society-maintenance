@@ -39,6 +39,12 @@ router.post('/login', async (req, res) => {
   }
 
   try {
+    if (mongoose.connection.readyState < 1) {
+      return res.status(503).json({
+        error: 'Database is not connected. Please verify MONGODB_URI in Vercel Environment Variables and MongoDB Atlas Network Access (IP whitelist).',
+      });
+    }
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
