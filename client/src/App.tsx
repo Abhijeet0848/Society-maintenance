@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navbar } from './components/layout/Navbar';
+import { BottomNav } from './components/layout/BottomNav';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
@@ -20,11 +21,11 @@ import './index.css';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-[#f8fafc]">
-        {/* Navbar will handle its own visibility based on route */}
+      <div className="min-h-screen bg-[#f8fafc] pb-16 lg:pb-0">
+        {/* Navbar for top header */}
         <Navbar />
         
-        {/* Main content without a global container to allow full-width pages like Login/Register */}
+        {/* Main content */}
         <main>
           <Routes>
             <Route path="/" element={<div className="container pt-20 sm:pt-24 pb-12 sm:pb-20"><LandingPage /></div>} />
@@ -56,6 +57,9 @@ function App() {
             } />
           </Routes>
         </main>
+
+        {/* Mobile Bottom Navigation Bar */}
+        <BottomNav />
         <SupportChat />
       </div>
     </Router>
