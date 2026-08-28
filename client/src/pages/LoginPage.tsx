@@ -97,7 +97,7 @@ export const LoginPage = () => {
              </div>
           )}
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6" autoComplete="off">
             <div className="flex flex-col gap-2">
               <label className="text-xs font-bold uppercase tracking-wider text-slate-700 ml-1">Email Address</label>
               <div className="relative flex items-center">
@@ -107,6 +107,7 @@ export const LoginPage = () => {
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="off"
                   className="w-full pl-12 pr-4 py-4 bg-white border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/15 rounded-2xl text-slate-900 transition-all font-semibold placeholder:text-slate-400 outline-none shadow-sm"
                   required
                 />
@@ -122,6 +123,7 @@ export const LoginPage = () => {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
                   className="w-full pl-12 pr-4 py-4 bg-white border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/15 rounded-2xl text-slate-900 transition-all font-semibold placeholder:text-slate-400 outline-none shadow-sm"
                   required
                 />

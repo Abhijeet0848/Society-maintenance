@@ -157,7 +157,7 @@ export const RegisterPage = () => {
              </div>
           )}
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5" autoComplete="off">
             <div className={`grid grid-cols-1 ${showKeyField ? 'sm:grid-cols-2' : ''} gap-5`}>
                <div className="flex flex-col gap-2">
                  <label className="text-xs font-bold uppercase tracking-wider text-slate-700 ml-1">Full Name</label>
@@ -169,6 +169,7 @@ export const RegisterPage = () => {
                      placeholder="John Doe"
                      value={formData.name}
                      onChange={handleChange}
+                     autoComplete="off"
                      className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/15 rounded-2xl text-slate-900 transition-all font-semibold text-sm outline-none shadow-sm"
                      required
                    />
@@ -186,6 +187,7 @@ export const RegisterPage = () => {
                        placeholder="A-402"
                        value={formData.flatNo}
                        onChange={handleChange}
+                       autoComplete="off"
                        className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/15 rounded-2xl text-slate-900 transition-all font-semibold text-sm outline-none shadow-sm"
                        required
                      />
@@ -204,6 +206,7 @@ export const RegisterPage = () => {
                        placeholder="••••••••"
                        value={formData.adminKey}
                        onChange={handleChange}
+                       autoComplete="new-password"
                        className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-300 focus:bg-white focus:border-amber-600 focus:ring-4 focus:ring-amber-500/15 rounded-2xl text-slate-900 transition-all font-semibold text-sm outline-none shadow-sm"
                        required
                      />
@@ -222,6 +225,7 @@ export const RegisterPage = () => {
                   placeholder="name@example.com"
                   value={formData.email}
                   onChange={handleChange}
+                  autoComplete="off"
                   className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/15 rounded-2xl text-slate-900 transition-all font-semibold text-sm outline-none shadow-sm"
                   required
                 />
@@ -238,6 +242,7 @@ export const RegisterPage = () => {
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={handleChange}
+                  autoComplete="new-password"
                   className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-300 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/15 rounded-2xl text-slate-900 transition-all font-semibold text-sm outline-none shadow-sm"
                   required
                 />
