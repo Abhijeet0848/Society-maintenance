@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Shield, Lock, Mail, Users, HardHat, ArrowRight } from 'lucide-react';
+import { resolveApiUrl } from '../services/api';
 
 export const LoginPage = () => {
   const [isAdminLogin, setIsAdminLogin] = useState(false);
@@ -16,7 +17,7 @@ export const LoginPage = () => {
     setError('');
     
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(resolveApiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -69,7 +70,7 @@ export const LoginPage = () => {
         </div>
 
         {/* Login Card wrapper - standard div to prevent class conflict from GlassCard */}
-        <div className="bg-white/90 backdrop-blur-xl border border-white shadow-[0_8px_40px_rgb(0,0,0,0.06)] rounded-[2rem] p-8 sm:p-10 flex flex-col gap-8">
+        <div className="bg-white/95 backdrop-blur-xl border border-white shadow-[0_8px_40px_rgb(0,0,0,0.06)] rounded-3xl sm:rounded-[2rem] p-5 sm:p-8 md:p-10 flex flex-col gap-6 sm:gap-8 w-full">
           
           {/* Tab Switcher */}
           <div className="flex p-1.5 bg-slate-100 rounded-2xl relative">

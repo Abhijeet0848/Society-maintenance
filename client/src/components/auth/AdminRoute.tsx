@@ -15,7 +15,7 @@ export const AdminRoute = ({ children }: { children?: ReactNode }) => {
     }
 
     // Verify role with backend to prevent "Inspect Element" bypasses
-    fetchWithAuth('http://localhost:5000/api/auth/verify-admin', {
+    fetchWithAuth('/api/auth/verify-admin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: user._id }),

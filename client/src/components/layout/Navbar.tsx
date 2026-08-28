@@ -45,7 +45,7 @@ export const Navbar = () => {
 
   const fetchNotifications = async () => {
     try {
-      const res = await fetchWithAuth(`http://localhost:5000/api/notifications/${user._id}`);
+      const res = await fetchWithAuth(`/api/notifications/${user._id}`);
       const data = await res.json();
       if (Array.isArray(data)) setNotifications(data);
     } catch (err) {
@@ -55,7 +55,7 @@ export const Navbar = () => {
 
   const markRead = async (id: string) => {
     try {
-      await fetchWithAuth(`http://localhost:5000/api/notifications/read/${id}`, { method: 'PATCH' });
+      await fetchWithAuth(`/api/notifications/read/${id}`, { method: 'PATCH' });
       fetchNotifications();
     } catch (err) {
       console.error('Error marking notif read');
@@ -109,21 +109,21 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] bg-white/80 backdrop-blur-md border-b border-slate-100">
-      <div className="container mx-auto px-6">
-        <div className="flex h-20 items-center justify-between">
-          <div className="flex items-center gap-12">
-            <Link to="/" className="text-2xl font-black tracking-tighter text-slate-900 group flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white text-xs rotate-12 group-hover:rotate-0 transition-all duration-500">BH</div>
+    <nav className="fixed top-0 left-0 right-0 z-[100] bg-white/90 backdrop-blur-md border-b border-slate-100">
+      <div className="container mx-auto">
+        <div className="flex h-16 sm:h-20 items-center justify-between">
+          <div className="flex items-center gap-6 lg:gap-12">
+            <Link to="/" className="text-xl sm:text-2xl font-black tracking-tighter text-slate-900 group flex items-center gap-2">
+              <div className="w-7 h-7 sm:w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white text-xs rotate-12 group-hover:rotate-0 transition-all duration-500">BH</div>
               <span>Society<span className="text-blue-600">Hub</span></span>
             </Link>
 
-            <div className="hidden lg:flex items-center gap-2">
+            <div className="hidden lg:flex items-center gap-1 xl:gap-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all text-decoration-none ${location.pathname === link.to ? 'bg-blue-600 text-white shadow-lg shadow-blue-100' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+                  className={`flex items-center gap-2 px-3 xl:px-5 py-2.5 rounded-xl text-sm font-bold transition-all text-decoration-none ${location.pathname === link.to ? 'bg-blue-600 text-white shadow-lg shadow-blue-100' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
                 >
                   <link.icon size={18} /> {link.label}
                 </Link>
@@ -131,15 +131,17 @@ export const Navbar = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-             <div className="hidden lg:flex items-center gap-4 relative" ref={notifRef}>
+          <div className="flex items-center gap-2 sm:gap-4">
+             {/* Notification Bell (Visible on both Desktop & Mobile Header) */}
+             <div className="relative" ref={notifRef}>
                 <button 
                   onClick={() => setShowNotifs(!showNotifs)}
-                  className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all border relative ${showNotifs ? 'bg-blue-50 text-blue-600 border-blue-200' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50 border-slate-100'}`}
+                  className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl flex items-center justify-center transition-all border relative ${showNotifs ? 'bg-blue-50 text-blue-600 border-blue-200' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50 border-slate-100'}`}
+                  aria-label="Notifications"
                 >
-                   <Bell size={20} />
+                   <Bell size={18} className="sm:w-5 sm:h-5" />
                    {unreadCount > 0 && (
-                      <span className="absolute top-[-2px] right-[-2px] w-5 h-5 bg-red-500 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-bounce">
+                      <span className="absolute top-[-2px] right-[-2px] w-4 h-4 sm:w-5 sm:h-5 bg-red-500 text-white text-[9px] sm:text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-bounce">
                          {unreadCount}
                       </span>
                    )}
@@ -147,56 +149,59 @@ export const Navbar = () => {
 
                 {/* Notifications Panel */}
                 {showNotifs && (
-                  <div className="absolute top-14 right-0 w-80 bg-white border border-slate-100 rounded-[2rem] shadow-2xl animate-fade-in overflow-hidden z-[1000]">
-                     <div className="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
+                  <div className="fixed sm:absolute top-16 sm:top-14 right-2 sm:right-0 w-[calc(100vw-1rem)] sm:w-80 max-w-sm bg-white border border-slate-100 rounded-2xl sm:rounded-[2rem] shadow-2xl animate-fade-in overflow-hidden z-[1000]">
+                     <div className="p-4 sm:p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/50">
                         <h4 className="text-xs font-black uppercase tracking-widest text-slate-900">Notifications</h4>
                         <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">{unreadCount} New</span>
                      </div>
-                     <div className="max-h-[400px] overflow-y-auto flex flex-col">
+                     <div className="max-h-[350px] overflow-y-auto flex flex-col">
                         {notifications.length > 0 ? notifications.map((notif, i) => (
                           <div 
                             key={i} 
-                            className={`p-5 hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-50 last:border-0 relative ${!notif.read ? 'bg-blue-50/10' : ''}`}
+                            className={`p-4 sm:p-5 hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-50 last:border-0 relative ${!notif.read ? 'bg-blue-50/10' : ''}`}
                             onClick={() => handleNotifClick(notif)}
                           >
-                             <div className="flex gap-4">
-                                <div className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center ${
+                             <div className="flex gap-3 sm:gap-4">
+                                <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl shrink-0 flex items-center justify-center ${
                                     notif.type === 'SUCCESS' ? 'bg-emerald-50 text-emerald-500' : 
                                     notif.type === 'WARNING' ? 'bg-amber-50 text-amber-500' : 'bg-blue-50 text-blue-500'
                                 }`}>
-                                   {notif.type === 'SUCCESS' ? <CheckCircle2 size={18} /> : 
-                                    notif.type === 'WARNING' ? <AlertTriangle size={18} /> : <Info size={18} />}
+                                   {notif.type === 'SUCCESS' ? <CheckCircle2 size={16} /> : 
+                                    notif.type === 'WARNING' ? <AlertTriangle size={16} /> : <Info size={16} />}
                                 </div>
-                                <div className="flex flex-col gap-1">
-                                   <p className="text-xs font-bold text-slate-900 leading-tight">{notif.title}</p>
-                                   <p className="text-[11px] text-slate-500 font-medium leading-relaxed">{notif.message}</p>
+                                <div className="flex flex-col gap-0.5 sm:gap-1 flex-1 min-w-0">
+                                   <p className="text-xs font-bold text-slate-900 leading-tight truncate">{notif.title}</p>
+                                   <p className="text-[11px] text-slate-500 font-medium leading-relaxed line-clamp-2">{notif.message}</p>
                                    <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mt-1">
                                       {new Date(notif.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                    </p>
                                 </div>
                              </div>
-                             {!notif.read && <div className="absolute top-6 right-6 w-1.5 h-1.5 bg-blue-600 rounded-full" />}
+                             {!notif.read && <div className="absolute top-5 right-4 w-1.5 h-1.5 bg-blue-600 rounded-full" />}
                           </div>
                         )) : (
-                          <div className="p-12 text-center flex flex-col items-center gap-4">
-                             <Bell size={32} className="text-slate-100" />
+                          <div className="p-8 sm:p-12 text-center flex flex-col items-center gap-3">
+                             <Bell size={28} className="text-slate-200" />
                              <p className="text-[10px] font-black uppercase tracking-widest text-slate-300">All caught up</p>
                           </div>
                         )}
                      </div>
-                     <div className="p-4 bg-slate-50/50 border-t border-slate-50">
+                     <div className="p-3 sm:p-4 bg-slate-50/50 border-t border-slate-50">
                         <Link 
                           to="/notifications" 
                           onClick={() => setShowNotifs(false)}
-                          className="w-full py-3 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-blue-600 transition-all flex items-center justify-center gap-2 text-decoration-none"
+                          className="w-full py-2.5 bg-white border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-blue-600 transition-all flex items-center justify-center gap-2 text-decoration-none"
                         >
                            View All Activity <ChevronRight size={12} />
                         </Link>
                      </div>
                   </div>
                 )}
+             </div>
 
-                 <Link to="/profile" className="flex items-center gap-2 pl-4 border-l border-slate-100 text-decoration-none group">
+             {/* Desktop Quick Links */}
+             <div className="hidden lg:flex items-center gap-3">
+                 <Link to="/profile" className="flex items-center gap-2 pl-3 border-l border-slate-100 text-decoration-none group" title="My Profile">
                     <div className="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-600 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
                        <Users size={20} />
                     </div>
@@ -230,33 +235,70 @@ export const Navbar = () => {
                  </button>
              </div>
 
-             <button className="lg:hidden text-slate-900 p-2 hover:bg-slate-50 rounded-xl" onClick={toggleMenu}>
-               {isOpen ? <X size={24} /> : <Menu size={24} />}
+             {/* Mobile Hamburger Toggle */}
+             <button 
+               className="lg:hidden text-slate-900 p-2 hover:bg-slate-50 rounded-xl focus:outline-none" 
+               onClick={toggleMenu}
+               aria-label="Toggle navigation menu"
+             >
+               {isOpen ? <X size={22} /> : <Menu size={22} />}
              </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Fullscreen Drawer */}
       {isOpen && (
-        <div className="lg:hidden absolute top-20 left-0 right-0 bg-white border-b border-slate-100 animate-slide-down">
-          <div className="flex flex-col p-6 gap-4">
+        <div className="lg:hidden fixed top-16 sm:top-20 left-0 right-0 bottom-0 bg-white/95 backdrop-blur-xl border-b border-slate-100 overflow-y-auto z-[99]">
+          <div className="flex flex-col p-4 sm:p-6 gap-2">
+            <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-1">Navigation</div>
             {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
                 onClick={toggleMenu}
-                className={`flex items-center gap-4 p-4 rounded-2xl font-bold ${location.pathname === link.to ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}
+                className={`flex items-center gap-3.5 p-3 sm:p-4 rounded-xl sm:rounded-2xl font-bold text-sm transition-all ${location.pathname === link.to ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-slate-600 hover:bg-slate-50'}`}
               >
-                <link.icon size={20} /> {link.label}
+                <link.icon size={18} /> {link.label}
               </Link>
             ))}
+
+            {user.role === 'ADMIN' && (
+              <>
+                <div className="text-[10px] font-black uppercase tracking-widest text-amber-500 px-3 pt-3">Administration</div>
+                <Link
+                  to="/admin"
+                  onClick={toggleMenu}
+                  className={`flex items-center gap-3.5 p-3 sm:p-4 rounded-xl sm:rounded-2xl font-bold text-sm transition-all ${location.pathname === '/admin' ? 'bg-amber-600 text-white' : 'text-amber-700 bg-amber-50/70 hover:bg-amber-50'}`}
+                >
+                  <Shield size={18} /> Incharge Dashboard
+                </Link>
+                <Link
+                  to="/admin/messages"
+                  onClick={toggleMenu}
+                  className={`flex items-center gap-3.5 p-3 sm:p-4 rounded-xl sm:rounded-2xl font-bold text-sm transition-all ${location.pathname === '/admin/messages' ? 'bg-blue-600 text-white' : 'text-blue-700 bg-blue-50/70 hover:bg-blue-50'}`}
+                >
+                  <MessageSquare size={18} /> Service Hub & Messages
+                </Link>
+              </>
+            )}
+
             <div className="h-px bg-slate-100 my-2" />
-            <Link to="/profile" className="flex items-center gap-4 p-4 text-slate-600 font-bold" onClick={toggleMenu}>
-               <Users size={20} /> My Profile
+            <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-1">Account</div>
+            
+            <Link 
+              to="/profile" 
+              className={`flex items-center gap-3.5 p-3 sm:p-4 rounded-xl font-bold text-sm ${location.pathname === '/profile' ? 'bg-blue-600 text-white' : 'text-slate-700 hover:bg-slate-50'}`}
+              onClick={toggleMenu}
+            >
+               <Users size={18} /> My Profile & Security
             </Link>
-            <button onClick={handleLogout} className="flex items-center gap-4 p-4 text-red-500 font-bold">
-               <LogOut size={20} /> Logout
+
+            <button 
+              onClick={() => { toggleMenu(); handleLogout(); }} 
+              className="flex items-center gap-3.5 p-3 sm:p-4 rounded-xl text-red-500 font-bold text-sm hover:bg-red-50 text-left w-full mt-2"
+            >
+               <LogOut size={18} /> Sign Out
             </button>
           </div>
         </div>

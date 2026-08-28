@@ -1,14 +1,14 @@
-import { Router } from 'express';
+import { Router, Response } from 'express';
 import Facility from '../models/Facility';
 import Booking from '../models/Booking';
+import { authMiddleware, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
-// Get all facilities
-router.get('/', async (req, res) => {
+// Get all facilities (Public / Authenticated)
+router.get('/', async (_req, res) => {
   try {
     const facilities = await Facility.find();
-    // Seed dummy facilities if none exist
     if (facilities.length === 0) {
       const dummy = [
         { name: "Club House", icon: "🏠", description: "For parties and events", capacity: 50, location: "Near Wing A" },
@@ -20,30 +20,57 @@ router.get('/', async (req, res) => {
     }
     res.json(facilities);
   } catch (err) {
-    res.status(500).json({ error: err });
+    console.error('Error fetching facilities:', err);
+    res.status(500).json({ error: 'Failed to fetch facilities' });
   }
 });
 
-// Get user bookings
-router.get('/bookings/:userId', async (req, res) => {
+// Get user bookings (Auth protected with IDOR isolation)
+router.get('/bookings/:userId', authMiddleware as any, async (req: AuthRequest, res: Response) => {
+  const { userId } = req.params;
+
+  if (userId !== req.user?.id && req.user?.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Access denied. You can only view your own bookings.' });
+  }
+
   try {
-    const bookings = await Booking.find({ userId: req.params.userId }).populate('facilityId').sort({ bookingDate: -1 });
+    const bookings = await Booking.find({ userId }).populate('facilityId').sort({ bookingDate: -1 });
     res.json(bookings);
   } catch (err) {
-    res.status(500).json({ error: err });
+    console.error('Error fetching bookings:', err);
+    res.status(500).json({ error: 'Failed to retrieve bookings' });
   }
 });
 
-// Create new booking
-router.post('/book', async (req, res) => {
+// Create new booking (Auth protected, forced user ownership)
+router.post('/book', authMiddleware as any, async (req: AuthRequest, res: Response) => {
+  const { facilityId, bookingDate, timeSlot } = req.body;
+
+  if (!facilityId || !bookingDate || !timeSlot) {
+    return res.status(400).json({ error: 'Facility ID, booking date, and time slot are required' });
+  }
+
   try {
-    const booking = new Booking(req.body);
+    const facility = await Facility.findById(facilityId);
+    if (!facility) {
+      return res.status(404).json({ error: 'Facility not found' });
+    }
+
+    // Force authenticated user's ID
+    const booking = new Booking({
+      facilityId,
+      userId: req.user?.id,
+      bookingDate,
+      timeSlot,
+      status: 'CONFIRMED'
+    });
+
     await booking.save();
     res.status(201).json(booking);
   } catch (err) {
-    res.status(400).json({ error: err });
+    console.error('Error creating booking:', err);
+    res.status(500).json({ error: 'Failed to process facility booking' });
   }
 });
 
 export default router;
-

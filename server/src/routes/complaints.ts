@@ -20,7 +20,7 @@ router.get('/', async (req: AuthRequest, res) => {
         return res.status(403).json({ message: 'Administrative credentials required for global view.' });
     }
 
-    const query = userId ? { userId } : {};
+    const query: Record<string, any> = userId ? { userId: String(userId) } : {};
     const complaints = await Complaint.find(query).populate('userId', 'name flatNo').sort({ createdAt: -1 });
     res.json(complaints);
   } catch (err) {

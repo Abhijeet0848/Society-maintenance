@@ -1,7 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'vrundavan_society_secret_key_2026';
+export const getJwtSecret = (): string => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret && process.env.NODE_ENV === 'production') {
+    throw new Error('FATAL SECURITY ERROR: JWT_SECRET environment variable must be set in production.');
+  }
+  return secret || 'vrundavan_society_dev_secret_key_2026';
+};
 
 export interface AuthRequest extends Request {
   user?: {
@@ -14,21 +20,21 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
   const token = req.header('Authorization')?.replace('Bearer ', '');
 
   if (!token) {
-    return res.status(401).json({ message: 'No authentication token provided. Access Denied.' });
+    return res.status(401).json({ error: 'Authentication required. Please log in.' });
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: string; role: string };
+    const decoded = jwt.verify(token, getJwtSecret()) as { id: string; role: string };
     req.user = decoded;
     next();
   } catch (err) {
-    res.status(401).json({ message: 'Invalid or expired token. Security Breach Prevented.' });
+    res.status(401).json({ error: 'Invalid or expired session. Please log in again.' });
   }
 };
 
 export const adminMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
-  if (req.user?.role !== 'ADMIN') {
-    return res.status(403).json({ message: 'Unauthorized Access: Administrative credentials required.' });
+  if (!req.user || req.user.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Forbidden: Administrative privileges required.' });
   }
   next();
 };

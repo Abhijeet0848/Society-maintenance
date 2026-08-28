@@ -27,36 +27,32 @@ function App() {
         {/* Main content without a global container to allow full-width pages like Login/Register */}
         <main>
           <Routes>
-            <Route path="/" element={<div className="container pb-20"><LandingPage /></div>} />
+            <Route path="/" element={<div className="container pt-20 sm:pt-24 pb-12 sm:pb-20"><LandingPage /></div>} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            <Route path="/dashboard" element={<div className="container pb-20"><DashboardPage /></div>} />
-            <Route path="/notices" element={<div className="container pb-20"><NoticesPage /></div>} />
-            <Route path="/notifications" element={<div className="container pb-20"><NotificationsPage /></div>} />
+            <Route path="/dashboard" element={<div className="container pt-20 sm:pt-24 pb-12 sm:pb-20"><DashboardPage /></div>} />
+            <Route path="/notices" element={<div className="container pt-20 sm:pt-24 pb-12 sm:pb-20"><NoticesPage /></div>} />
+            <Route path="/notifications" element={<div className="container pt-20 sm:pt-24 pb-12 sm:pb-20"><NotificationsPage /></div>} />
             
             {/* Secure Admin Section */}
             <Route element={<AdminRoute />}>
-              <Route path="/admin" element={<div className="container pb-20"><AdminDashboardPage /></div>} />
+              <Route path="/admin" element={<div className="container pt-20 sm:pt-24 pb-12 sm:pb-20"><AdminDashboardPage /></div>} />
+              <Route path="/admin/messages" element={<div className="container pt-20 sm:pt-24 pb-12 sm:pb-20"><AdminMessagesPage /></div>} />
             </Route>
 
-            <Route path="/profile" element={<div className="container pb-20"><ProfilePage /></div>} />
-            <Route path="/maintenance" element={<div className="container pb-20"><MaintenancePage /></div>} />
-            <Route path="/complaints" element={<div className="container pb-20"><ComplaintsPage /></div>} />
-            <Route path="/facilities" element={<div className="container pb-20"><FacilitiesPage /></div>} />
-            <Route path="/directory" element={<div className="container pb-20"><DirectoryPage /></div>} />
+            <Route path="/profile" element={<div className="container pt-20 sm:pt-24 pb-12 sm:pb-20"><ProfilePage /></div>} />
+            <Route path="/maintenance" element={<div className="container pt-20 sm:pt-24 pb-12 sm:pb-20"><MaintenancePage /></div>} />
+            <Route path="/complaints" element={<div className="container pt-20 sm:pt-24 pb-12 sm:pb-20"><ComplaintsPage /></div>} />
+            <Route path="/facilities" element={<div className="container pt-20 sm:pt-24 pb-12 sm:pb-20"><FacilitiesPage /></div>} />
+            <Route path="/directory" element={<div className="container pt-20 sm:pt-24 pb-12 sm:pb-20"><DirectoryPage /></div>} />
             <Route path="*" element={
-               <div className="container py-40 text-center animate-fade-in relative">
-                  <h1 className="text-9xl font-black text-slate-100 absolute left-1/2 -translate-x-1/2 top-40 z-0">404</h1>
+               <div className="container pt-28 py-40 text-center animate-fade-in relative">
+                  <h1 className="text-7xl sm:text-9xl font-black text-slate-100 absolute left-1/2 -translate-x-1/2 top-40 z-0">404</h1>
                   <div className="relative z-10">
-                    <h2 className="text-4xl font-bold text-slate-900 tracking-tight">Access Restricted</h2>
+                    <h2 className="text-2xl sm:text-4xl font-bold text-slate-900 tracking-tight">Access Restricted</h2>
                     <p className="text-slate-500 font-medium mt-2">Under construction for Vrundavan Society.</p>
                   </div>
                </div>
-            } />
-            <Route path="/admin/messages" element={
-              <AdminRoute>
-                <AdminMessagesPage />
-              </AdminRoute>
             } />
           </Routes>
         </main>

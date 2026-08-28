@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, User, Building, MapPin, ArrowRight, HardHat, Users, Key, Sparkles } from 'lucide-react';
+import { resolveApiUrl } from '../services/api';
 
 export const RegisterPage = () => {
   const [isAdminRegister, setIsAdminRegister] = useState(false);
@@ -19,7 +20,7 @@ export const RegisterPage = () => {
 
   useEffect(() => {
     // Check if any admins exist to determine bootstrap mode
-    fetch('http://localhost:5000/api/auth/admin-count')
+    fetch(resolveApiUrl('/api/auth/admin-count'))
       .then(res => res.json())
       .then(data => setAdminCount(data.count))
       .catch(err => console.error('Error fetching admin count:', err));
@@ -43,7 +44,7 @@ export const RegisterPage = () => {
     // Only validate Admin Key if registering as incharge AND at least one admin already exists
     if (isAdminRegister && adminCount !== null && adminCount > 0) {
       try {
-        const keyResponse = await fetch('http://localhost:5000/api/config/admin_registration_key');
+        const keyResponse = await fetch(resolveApiUrl('/api/config/admin_registration_key'));
         const validKey = await keyResponse.json();
         const keyToCheck = validKey || 'SOCIETY2024';
         
@@ -62,7 +63,7 @@ export const RegisterPage = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch(resolveApiUrl('/api/auth/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -117,7 +118,7 @@ export const RegisterPage = () => {
         </div>
 
         {/* Register Card */}
-        <div className="bg-white/90 backdrop-blur-xl border border-white shadow-[0_8px_40px_rgb(0,0,0,0.06)] rounded-[2.5rem] p-8 sm:p-10 flex flex-col gap-8">
+        <div className="bg-white/95 backdrop-blur-xl border border-white shadow-[0_8px_40px_rgb(0,0,0,0.06)] rounded-3xl sm:rounded-[2.5rem] p-5 sm:p-8 md:p-10 flex flex-col gap-6 sm:gap-8 w-full">
           
           {/* Role Switcher */}
           <div className="flex p-1.5 bg-slate-100 rounded-2xl relative">

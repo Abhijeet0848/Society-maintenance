@@ -5,14 +5,12 @@ import {
   MessageSquare, 
   Plus, 
   Search, 
-  ChevronRight, 
   AlertCircle,
   Clock,
-  CheckCircle2,
-  X,
-  History,
   TrendingDown,
-  TrendingUp
+  TrendingUp,
+  X,
+  CheckCircle2
 } from 'lucide-react';
 
 export const ComplaintsPage = () => {
@@ -36,7 +34,7 @@ export const ComplaintsPage = () => {
     if (!user._id) return;
     
     try {
-      const res = await fetchWithAuth(`http://localhost:5000/api/complaints?userId=${user._id}`);
+      const res = await fetchWithAuth(`/api/complaints?userId=${user._id}`);
       const data = await res.json();
       if (Array.isArray(data)) setComplaints(data);
     } catch (err) {
@@ -76,7 +74,7 @@ export const ComplaintsPage = () => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     
     try {
-      const res = await fetchWithAuth('http://localhost:5000/api/complaints', {
+      const res = await fetchWithAuth('/api/complaints', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, userId: user._id }),
@@ -98,47 +96,47 @@ export const ComplaintsPage = () => {
   };
 
   return (
-    <div className="flex flex-col gap-10 py-10 animate-fade-in text-left relative">
+    <div className="flex flex-col gap-6 sm:gap-10 py-6 sm:py-10 animate-fade-in text-left relative">
       
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-slate-100 pb-10">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sm:gap-6 border-b border-slate-100 pb-6 sm:pb-10">
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-1 sm:mb-2">
              <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-             <p className="text-blue-500 font-black uppercase tracking-[0.2em] text-[10px] bg-blue-50 p-1 px-3 rounded-full">Support Center</p>
+             <p className="text-blue-500 font-black uppercase tracking-[0.2em] text-[9px] sm:text-[10px] bg-blue-50 py-0.5 sm:py-1 px-2.5 sm:px-3 rounded-full">Support Center</p>
           </div>
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">
             Helpdesk & <span className="text-blue-600">Complaints</span>
           </h1>
-          <p className="text-slate-500 font-medium text-lg mt-1">Review, filter, and track your active flat concerns.</p>
+          <p className="text-slate-500 font-medium text-sm sm:text-lg mt-0.5 sm:mt-1">Review, filter, and track your active flat concerns.</p>
         </div>
         <button 
           onClick={() => setIsRaising(true)}
-          className="btn btn-primary px-8 py-4 shadow-xl shadow-blue-200 group"
+          className="w-full md:w-auto btn btn-primary px-6 sm:px-8 py-3.5 sm:py-4 shadow-xl shadow-blue-200 group text-xs sm:text-sm uppercase tracking-widest font-black"
         >
-          <Plus size={20} className="group-hover:rotate-90 transition-transform" /> Raise New Complaint
+          <Plus size={18} className="group-hover:rotate-90 transition-transform" /> Raise New Complaint
         </button>
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="flex flex-col lg:flex-row gap-4 justify-between items-center px-2">
+      <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 justify-between items-center w-full">
         <div className="relative w-full lg:w-[400px]">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
           <input 
-            className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 focus:border-blue-500 rounded-2xl shadow-sm outline-none font-medium transition-all" 
+            className="w-full pl-12 pr-4 py-3 sm:py-3.5 bg-white border border-slate-200 focus:border-blue-500 rounded-2xl shadow-sm outline-none font-medium text-sm transition-all" 
             placeholder="Search tickets..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="flex flex-wrap gap-3 w-full lg:w-auto">
+        <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3 w-full lg:w-auto">
            {/* Status Filter */}
-           <div className="flex p-1 bg-slate-100 rounded-2xl flex-1 lg:flex-none">
+           <div className="flex p-1 bg-slate-100 rounded-2xl flex-1 sm:flex-none justify-between sm:justify-start">
               {(['ALL', 'OPEN', 'RESOLVED'] as const).map((s) => (
                 <button 
                   key={s}
                   onClick={() => setFilterStatus(s)}
-                  className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filterStatus === s ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all ${filterStatus === s ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                 >
                   {s}
                 </button>
@@ -148,103 +146,96 @@ export const ComplaintsPage = () => {
            {/* Date Sort Toggle */}
            <button 
             onClick={() => setSortBy(sortBy === 'NEWEST' ? 'OLDEST' : 'NEWEST')}
-            className={`flex items-center justify-center gap-3 py-3 px-6 rounded-2xl transition-all flex-1 lg:flex-none text-[10px] font-black uppercase tracking-widest shadow-sm ${sortBy === 'NEWEST' ? 'bg-blue-600 text-white shadow-blue-100' : 'bg-slate-900 text-white shadow-slate-200'}`}
+            className={`flex items-center justify-center gap-2 sm:gap-3 py-2.5 sm:py-3 px-4 sm:px-6 rounded-2xl transition-all flex-1 sm:flex-none text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-sm ${sortBy === 'NEWEST' ? 'bg-blue-600 text-white shadow-blue-100' : 'bg-slate-900 text-white shadow-slate-200'}`}
            >
-             {sortBy === 'NEWEST' ? <TrendingDown size={14} /> : <TrendingUp size={14} />} {sortBy}
+             {sortBy === 'NEWEST' ? <TrendingDown size={13} /> : <TrendingUp size={13} />} {sortBy}
            </button>
         </div>
       </div>
 
       {/* Main Content Area */}
       {filteredAndSortedComplaints.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
-          {filteredAndSortedComplaints.map((item, i) => (
-            <GlassCard key={i} className="flex flex-col gap-6 p-8 border-none shadow-sm hover:shadow-xl hover:translate-y-[-4px] transition-all bg-white group cursor-pointer">
-              <div className="flex justify-between items-start">
-                <div className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] shadow-sm ${item.status === 'RESOLVED' ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white'}`}>
-                   {item.status || 'OPEN'}
-                </div>
-                <div className="flex items-center gap-2 text-[10px] font-black text-slate-300 group-hover:text-blue-500 transition-colors uppercase tracking-widest">
-                   ID #{item._id.slice(-4)} <ChevronRight size={14} />
-                </div>
-              </div>
-              <div className="flex flex-col gap-3">
-                <h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{item.title}</h3>
-                <p className="text-sm text-slate-500 font-medium leading-relaxed line-clamp-2">{item.description}</p>
-              </div>
-              <div className="flex items-center gap-6 mt-4 pt-6 border-t border-slate-50">
-                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                   <Clock size={12} className="text-blue-400" /> {new Date(item.createdAt).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})}
-                </div>
-                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                   <AlertCircle size={12} className="text-amber-500" /> {item.category || 'Maintenance'}
-                </div>
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 pb-12 sm:pb-20">
+          {filteredAndSortedComplaints.map((complaint) => (
+            <GlassCard 
+               key={complaint._id} 
+               className="flex flex-col justify-between gap-4 sm:gap-6 hover:shadow-lg transition-all p-5 sm:p-8 rounded-3xl bg-white border-slate-100 group"
+            >
+               <div className="flex flex-col gap-3 sm:gap-4">
+                  <div className="flex justify-between items-start gap-2">
+                     <div className="flex flex-wrap items-center gap-2">
+                        <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-slate-100 text-slate-600">
+                           {complaint.category || 'General'}
+                        </span>
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                           <Clock size={12} /> {new Date(complaint.createdAt).toLocaleDateString()}
+                        </div>
+                     </div>
+                     <span className={`px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1 shrink-0 ${
+                        complaint.status === 'OPEN' ? 'bg-amber-50 text-amber-600 border border-amber-200/50' : 'bg-emerald-50 text-emerald-600 border border-emerald-200/50'
+                     }`}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${complaint.status === 'OPEN' ? 'bg-amber-500 animate-ping' : 'bg-emerald-500'}`} />
+                        {complaint.status}
+                     </span>
+                  </div>
+
+                  <div>
+                     <h3 className="text-base sm:text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-snug">{complaint.title}</h3>
+                     <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1 leading-relaxed line-clamp-3">{complaint.description}</p>
+                  </div>
+               </div>
+
+               <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                  <span>Ticket ID: #{complaint._id.slice(-6)}</span>
+                  <span className="text-slate-500">{complaint.userId?.flatNo ? `Flat ${complaint.userId.flatNo}` : 'Resident'}</span>
+               </div>
             </GlassCard>
           ))}
         </div>
       ) : (
-        <GlassCard className="p-24 text-center flex flex-col items-center justify-center gap-6 bg-white border-2 border-dashed border-slate-100 shadow-sm rounded-[3rem]">
-          <div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center">
-             <History size={48} className="text-blue-200" />
-          </div>
-          <div className="flex flex-col gap-2">
-            <h3 className="text-3xl font-extrabold text-slate-900">No Tickets Found</h3>
-            <p className="text-slate-500 font-medium max-w-sm mx-auto leading-relaxed">
-              {searchQuery || filterStatus !== 'ALL' 
-                ? "No complaints match your current search or filter criteria. Try adjusting them." 
-                : "Everything in your flat seems to be working perfectly. If any issues arise, we're here to help."}
-            </p>
-          </div>
-          <button 
-            onClick={() => {
-              setSearchQuery('');
-              setFilterStatus('ALL');
-              if (complaints.length === 0) setIsRaising(true);
-            }}
-            className="btn btn-primary px-10 py-4 shadow-xl shadow-blue-100 mt-4"
-          >
-            {complaints.length === 0 ? 'New Complaint Report' : 'Clear All Filters'}
-          </button>
+        <GlassCard className="p-8 sm:p-16 text-center flex flex-col items-center gap-4 bg-white border-slate-100">
+           <AlertCircle size={40} className="text-slate-200 sm:w-12 sm:h-12" />
+           <div>
+              <h3 className="text-lg sm:text-xl font-bold text-slate-900">No Tickets Found</h3>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-sm">No complaints matching the selected filters were found.</p>
+           </div>
         </GlassCard>
       )}
 
-      {/* New Complaint Modal Overlay */}
+      {/* Raise Complaint Modal */}
       {isRaising && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setIsRaising(false)}></div>
-          <GlassCard className="w-full max-w-xl bg-white border-none shadow-2xl animate-fade-in z-10 p-10 relative overflow-hidden rounded-[2.5rem]">
-             <div className="absolute top-0 right-0 p-4">
-                <button onClick={() => setIsRaising(false)} className="w-10 h-10 rounded-full hover:bg-slate-50 flex items-center justify-center transition-colors">
-                   <X size={24} className="text-slate-400" />
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setIsRaising(false)}></div>
+          <GlassCard className="w-full max-w-xl max-h-[90vh] overflow-y-auto bg-white border-none shadow-2xl animate-fade-in z-10 p-5 sm:p-10 rounded-3xl sm:rounded-[3rem] relative">
+             <div className="flex justify-between items-center pb-4 sm:pb-6 border-b border-slate-50">
+                <div className="flex items-center gap-3">
+                   <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                      <MessageSquare size={18} />
+                   </div>
+                   <h3 className="text-lg sm:text-xl font-bold text-slate-900">New Assistance Ticket</h3>
+                </div>
+                <button onClick={() => setIsRaising(false)} className="w-8 h-8 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-100">
+                  <X size={18} />
                 </button>
              </div>
              
-             <div className="flex flex-col gap-10">
-                <div className="flex flex-col gap-2">
-                   <div className="flex items-center gap-3 text-blue-600 font-black text-xs uppercase tracking-widest mb-1">
-                      <MessageSquare size={16} /> New Assistance Ticket
-                   </div>
-                   <h2 className="text-3xl font-black text-slate-900">Incident Details</h2>
-                   <p className="text-slate-500 font-medium leading-relaxed">Provide as much information as possible for faster resolution.</p>
-                </div>
-
-                <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+             <div className="flex flex-col gap-6 sm:gap-8 mt-4 sm:mt-6">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:gap-6">
                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Descriptive Title</label>
+                      <label className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Descriptive Title</label>
                       <input 
                          required
-                         className="w-full px-5 py-4 bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 rounded-2xl text-slate-900 transition-all font-bold outline-none" 
-                         placeholder="e.gars Water seepage from ceiling" 
+                         className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 rounded-xl sm:rounded-2xl text-slate-900 transition-all font-bold outline-none text-sm" 
+                         placeholder="e.g. Water seepage from ceiling" 
                          value={formData.title}
                          onChange={(e) => setFormData({...formData, title: e.target.value})}
                       />
                    </div>
 
                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Service Category</label>
+                      <label className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Service Category</label>
                       <select 
-                         className="w-full px-5 py-4 bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 rounded-2xl text-slate-900 transition-all font-bold outline-none appearance-none"
+                         className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 rounded-xl sm:rounded-2xl text-slate-900 transition-all font-bold outline-none text-sm"
                          value={formData.category}
                          onChange={(e) => setFormData({...formData, category: e.target.value})}
                       >
@@ -257,11 +248,11 @@ export const ComplaintsPage = () => {
                    </div>
 
                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Issue Description</label>
+                      <label className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-400 ml-1">Issue Description</label>
                       <textarea 
                          required
                          rows={4}
-                         className="w-full px-5 py-4 bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 rounded-2xl text-slate-900 transition-all font-medium outline-none resize-none" 
+                         className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 rounded-xl sm:rounded-2xl text-slate-900 transition-all font-medium outline-none resize-none text-sm" 
                          placeholder="Please explain the problem including the specific area..." 
                          value={formData.description}
                          onChange={(e) => setFormData({...formData, description: e.target.value})}
@@ -270,7 +261,7 @@ export const ComplaintsPage = () => {
 
                    <button 
                       type="submit" 
-                      className="btn btn-primary w-full py-5 text-lg font-black uppercase tracking-widest shadow-xl shadow-blue-200"
+                      className="btn btn-primary w-full py-4 sm:py-5 text-sm sm:text-base font-black uppercase tracking-widest shadow-xl shadow-blue-200"
                       disabled={loading}
                    >
                       {loading ? 'Transmitting...' : 'Submit Assistance Ticket'}
@@ -288,4 +279,3 @@ export const ComplaintsPage = () => {
     </div>
   );
 };
-
