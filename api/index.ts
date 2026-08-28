@@ -1,32 +1,8 @@
-import type { IncomingMessage, ServerResponse } from 'http';
-import app from '../server/src/index';
+export default async function handler(req: any, res: any) {
+  const origin = req.headers?.origin || '*';
 
-const ALLOWED_ORIGINS = [
-  'https://society-maintenance.gautamabhijeet050.workers.dev',
-  'https://society-maintenance-api-sandy.vercel.app',
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'http://localhost:5000',
-];
-
-export default async function handler(
-  req: IncomingMessage & { method?: string; headers: Record<string, any> },
-  res: ServerResponse & { status?: any; json?: any; setHeader: (k: string, v: string) => void; end: () => void }
-) {
-  const origin = (req.headers.origin as string) || '';
-
-  // Set explicit CORS headers
-  if (
-    ALLOWED_ORIGINS.includes(origin) ||
-    origin.endsWith('.workers.dev') ||
-    origin.endsWith('.pages.dev') ||
-    origin.endsWith('.vercel.app')
-  ) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  }
-
+  // Set explicit CORS headers for all incoming requests
+  res.setHeader('Access-Control-Allow-Origin', origin);
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader(
@@ -34,18 +10,39 @@ export default async function handler(
     'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization'
   );
 
-  // Instantly return 200 OK for browser preflight OPTIONS requests
+  // Instantly handle preflight OPTIONS without loading backend dependencies
   if (req.method === 'OPTIONS') {
-    if (typeof res.writeHead === 'function') {
-      res.writeHead(200);
-    } else {
-      res.statusCode = 200;
+    if (typeof res.status === 'function') {
+      return res.status(200).end();
     }
-    res.end();
-    return;
+    res.statusCode = 200;
+    return res.end();
   }
 
-  // Forward all application requests to Express
-  return app(req, res);
+  try {
+    // Dynamic import to catch any module load or runtime initialization error
+    const serverModule = await import('../server/src/index');
+    const app = serverModule.default || serverModule;
+    return app(req, res);
+  } catch (error: any) {
+    console.error('Serverless Handler Exception:', error);
+    if (typeof res.status === 'function') {
+      return res.status(500).json({
+        error: 'Backend Serverless Execution Error',
+        message: error?.message || String(error),
+        stack: error?.stack,
+      });
+    }
+    res.statusCode = 500;
+    res.setHeader('Content-Type', 'application/json');
+    return res.end(
+      JSON.stringify({
+        error: 'Backend Serverless Execution Error',
+        message: error?.message || String(error),
+        stack: error?.stack,
+      })
+    );
+  }
 }
+
 
