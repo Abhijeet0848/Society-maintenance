@@ -120,6 +120,7 @@ const DEFAULT_MONGODB_URI =
   'mongodb+srv://gautamabhijeet050_db_user:XA5pl6w7dkRmP0Rp@cluster1.ph5nmmj.mongodb.net/society-maintenance?retryWrites=true&w=majority&appName=Cluster1';
 const MONGODB_URI = process.env.MONGODB_URI || DEFAULT_MONGODB_URI;
 
+let cachedPromise: Promise<typeof mongoose> | null = null;
 export const connectDB = async () => {
   if (mongoose.connection.readyState === 1) {
     return mongoose;
