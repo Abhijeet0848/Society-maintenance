@@ -54,11 +54,11 @@ git push origin main
 1. Under **Environment variables (Advanced)** in the Cloudflare Pages creation screen, add:
    - `MONGODB_URI`:
      ```
-     mongodb+srv://gautamabhijeet050_db_user:XA5pl6w7dkRmP0Rp@cluster1.ph5nmmj.mongodb.net/society-maintenance?retryWrites=true&w=majority&appName=Cluster1
+     mongodb+srv://<username>:<password>@<cluster-address>/<database>?retryWrites=true&w=majority
      ```
    - `JWT_SECRET`:
      ```
-     vrundavan_super_secret_jwt_key_2026_secure
+     <your_secure_random_jwt_secret_key>
      ```
    - `NODE_VERSION`: `20`
 
