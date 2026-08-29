@@ -8,8 +8,10 @@ export const BottomNav = () => {
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
   const isPublicPage = location.pathname === '/';
 
+  const userId = user._id || user.id;
+
   // Do not render on login/register/landing or if user not logged in
-  if (isAuthPage || isPublicPage || !user._id) return null;
+  if (isAuthPage || isPublicPage || !userId) return null;
 
   const tabs = [
     { to: '/dashboard', label: 'Home', icon: Home },
