@@ -17,7 +17,7 @@ router.use(adminMiddleware);
 router.get('/stats', async (req, res) => {
   try {
     const residentCount = await User.countDocuments({ role: 'RESIDENT' });
-    const openComplaints = await Complaint.countDocuments({ status: 'OPEN' });
+    const openComplaints = await Complaint.countDocuments({ status: { $ne: 'RESOLVED' } });
     
     // Calculate collection percentage for current month
     const now = new Date();
@@ -35,7 +35,7 @@ router.get('/stats', async (req, res) => {
     const totalReserve = paidBillsAll.reduce((sum, bill) => sum + bill.amount, 0);
 
     // Get recent complaints
-    const recentComplaints = await Complaint.find({ status: 'OPEN' })
+    const recentComplaints = await Complaint.find({ status: { $ne: 'RESOLVED' } })
       .populate('userId', 'name flatNo')
       .sort({ createdAt: -1 })
       .limit(3);

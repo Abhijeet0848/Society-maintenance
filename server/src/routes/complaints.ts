@@ -10,18 +10,19 @@ router.use(authMiddleware as any);
 router.get('/', async (req: AuthRequest, res) => {
   const { userId } = req.query;
   try {
-    // Security: Users can only see their own complaints unless Admin
-    if (userId && userId !== req.user?.id && req.user?.role !== 'ADMIN') {
-        return res.status(403).json({ message: 'Authorization Failure: Restricted dataset access.' });
-    }
-    
-    // If no userId provided, only Admins can see "everything"
-    if (!userId && req.user?.role !== 'ADMIN') {
-        return res.status(403).json({ message: 'Administrative credentials required for global view.' });
+    let query: Record<string, any> = {};
+    if (req.user?.role === 'ADMIN') {
+      if (userId) {
+        query.userId = String(userId);
+      }
+    } else {
+      // Residents automatically see their own complaints
+      query.userId = req.user?.id;
     }
 
-    const query: Record<string, any> = userId ? { userId: String(userId) } : {};
-    const complaints = await Complaint.find(query).populate('userId', 'name flatNo').sort({ createdAt: -1 });
+    const complaints = await Complaint.find(query)
+      .populate('userId', 'name flatNo email')
+      .sort({ createdAt: -1 });
     res.json(complaints);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch complaints' });
@@ -30,29 +31,32 @@ router.get('/', async (req: AuthRequest, res) => {
 
 router.post('/', async (req: AuthRequest, res) => {
   try {
-    const { title, description, userId, category } = req.body;
-    
-    // Security: Prevent impersonation (user can't create complaint for someone else)
-    if (userId !== req.user?.id) {
-        return res.status(403).json({ message: 'Security Breach: Profile impersonation attempt.' });
+    const { title, description, category, priority } = req.body;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
     }
 
-    if (!title || !description || !userId) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    if (!title || !description) {
+      return res.status(400).json({ error: 'Title and description are required' });
     }
 
     const complaint = new Complaint({
       title,
       description,
       userId,
-      category: category || 'Maintenance',
-      status: 'OPEN'
+      category: category || 'MAINTENANCE',
+      priority: priority || 'MEDIUM',
+      status: 'PENDING'
     });
 
     await complaint.save();
+    await complaint.populate('userId', 'name flatNo email');
     res.status(201).json(complaint);
-  } catch (err) {
-    res.status(500).json({ error: 'Internal server error while creating complaint' });
+  } catch (err: any) {
+    console.error('Error creating complaint:', err);
+    res.status(500).json({ error: err?.message || 'Internal server error while creating complaint' });
   }
 });
 
@@ -61,7 +65,7 @@ router.patch('/:id', adminMiddleware as any, async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   try {
-    const updated = await Complaint.findByIdAndUpdate(id, { status }, { new: true });
+    const updated = await Complaint.findByIdAndUpdate(id, { status }, { new: true }).populate('userId', 'name flatNo email');
     if (updated) {
       res.json(updated);
     } else {
