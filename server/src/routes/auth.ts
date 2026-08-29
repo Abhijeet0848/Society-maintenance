@@ -20,6 +20,17 @@ router.get('/residents', authMiddleware as any, async (_req, res) => {
   }
 });
 
+// Get list of all administrators for support channels
+router.get('/admins', authMiddleware as any, async (_req, res) => {
+  try {
+    const admins = await User.find({ role: 'ADMIN' }).select('name flatNo email');
+    res.json(admins);
+  } catch (err) {
+    console.error('Error fetching admins:', err);
+    res.status(500).json({ error: 'Failed to fetch administrator contacts' });
+  }
+});
+
 // Admin Count for bootstrap status
 router.get('/admin-count', async (_req, res) => {
   try {

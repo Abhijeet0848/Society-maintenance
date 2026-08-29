@@ -45,9 +45,17 @@ export const SupportChat = () => {
 
   const fetchAdminId = async () => {
      try {
-        await fetchWithAuth('/api/auth/residents');
-        setAdminId('OFFICE_RECIPIENT'); // Placeholder logic
-     } catch (err) {}
+        const res = await fetchWithAuth('/api/auth/admins');
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          setAdminId(data[0]._id);
+        } else {
+          setAdminId('ADMIN');
+        }
+     } catch (err) {
+        console.error('Error fetching admin ID for chat:', err);
+        setAdminId('ADMIN');
+     }
   };
 
   const fetchMessages = async () => {
@@ -56,7 +64,7 @@ export const SupportChat = () => {
       const data = await res.json();
       if (Array.isArray(data)) setMessages(data);
     } catch (err) {
-      console.error('Error fetching chat history');
+      console.error('Error fetching chat history:', err);
     }
   };
 
@@ -66,16 +74,21 @@ export const SupportChat = () => {
     
     setLoading(true);
     try {
-      await fetchWithAuth('/api/messages', {
+      const res = await fetchWithAuth('/api/messages', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           receiverId: adminId || 'ADMIN',
-          content: newMessage
+          content: newMessage.trim()
         })
       });
-      setNewMessage('');
-      fetchMessages();
-    } catch (err) {} finally {
+      if (res.ok) {
+        setNewMessage('');
+        fetchMessages();
+      }
+    } catch (err) {
+      console.error('Failed to send support message:', err);
+    } finally {
       setLoading(false);
     }
   };

@@ -1,38 +1,116 @@
 import { useState, useEffect } from 'react';
+import { fetchWithAuth } from '../services/api';
 import { GlassCard } from "../components/ui/GlassCard";
 import { 
   CreditCard, 
   Bell, 
   Calendar, 
   MessageSquare, 
-  PlusCircle,
-  TrendingUp,
-  ShieldCheck,
-  Users,
-  Search,
-  ChevronRight,
-  Wallet
+  PlusCircle, 
+  TrendingUp, 
+  ShieldCheck, 
+  Users, 
+  ChevronRight, 
+  Wallet 
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
+  const [dues, setDues] = useState<number>(0);
+  const [pendingComplaints, setPendingComplaints] = useState<number>(0);
+  const [noticesCount, setNoticesCount] = useState<number>(0);
+  const [latestNotice, setLatestNotice] = useState<any>(null);
   
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      const parsedUser = JSON.parse(savedUser);
+      setUser(parsedUser);
+      loadDashboardData(parsedUser._id || parsedUser.id);
+    } else {
+      navigate('/login');
     }
-  }, []);
+  }, [navigate]);
+
+  const loadDashboardData = async (userId: string) => {
+    try {
+      // 1. Fetch Maintenance Bills
+      if (userId) {
+        try {
+          const billsRes = await fetchWithAuth(`/api/billing/${userId}`);
+          const billsData = await billsRes.json();
+          if (Array.isArray(billsData)) {
+            const unpaid = billsData.filter(b => b.status === 'PENDING').reduce((sum, b) => sum + (b.amount || 0), 0);
+            setDues(unpaid);
+          }
+        } catch {}
+      }
+
+      // 2. Fetch Complaints
+      try {
+        const compRes = await fetchWithAuth('/api/complaints');
+        const compData = await compRes.json();
+        if (Array.isArray(compData)) {
+          const pending = compData.filter(c => c.status !== 'RESOLVED').length;
+          setPendingComplaints(pending);
+        }
+      } catch {}
+
+      // 3. Fetch Notices
+      try {
+        const notRes = await fetchWithAuth('/api/notices');
+        const notData = await notRes.json();
+        if (Array.isArray(notData)) {
+          setNoticesCount(notData.length);
+          if (notData.length > 0) {
+            setLatestNotice(notData[0]);
+          }
+        }
+      } catch {}
+    } catch {}
+  };
 
   const currentMonth = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(new Date());
 
   const stats = [
-    { title: "Current Dues", value: "₹ 0.00", icon: Wallet, color: "text-blue-500", bg: "bg-blue-500/10", trend: "Paid in full" },
-    { title: "Complaints", value: "0", icon: MessageSquare, color: "text-amber-500", bg: "bg-amber-500/10", trend: "0 pending resolution" },
-    { title: "Notice Board", value: "0", icon: Bell, color: "text-blue-500", bg: "bg-blue-500/10", trend: "Check for updates" },
-    { title: "Society Fund", value: "Audited", icon: TrendingUp, color: "text-emerald-500", bg: "bg-emerald-500/10", trend: `Updated ${new Date().getFullYear()}` },
+    { 
+      title: "Current Dues", 
+      value: `₹ ${dues.toLocaleString()}`, 
+      icon: Wallet, 
+      color: dues > 0 ? "text-amber-500" : "text-emerald-500", 
+      bg: dues > 0 ? "bg-amber-50" : "bg-emerald-50", 
+      trend: dues > 0 ? "Pending Payment" : "Paid in full",
+      path: "/maintenance"
+    },
+    { 
+      title: "Complaints", 
+      value: String(pendingComplaints), 
+      icon: MessageSquare, 
+      color: pendingComplaints > 0 ? "text-amber-500" : "text-blue-500", 
+      bg: pendingComplaints > 0 ? "bg-amber-50" : "bg-blue-50", 
+      trend: `${pendingComplaints} pending resolution`,
+      path: "/complaints"
+    },
+    { 
+      title: "Notice Board", 
+      value: String(noticesCount), 
+      icon: Bell, 
+      color: "text-blue-500", 
+      bg: "bg-blue-50", 
+      trend: noticesCount > 0 ? `${noticesCount} circulars issued` : "No active circulars",
+      path: "/notices"
+    },
+    { 
+      title: "Society Fund", 
+      value: "Audited", 
+      icon: TrendingUp, 
+      color: "text-emerald-500", 
+      bg: "bg-emerald-50", 
+      trend: `Updated ${new Date().getFullYear()}`,
+      path: "/maintenance"
+    },
   ];
 
   const quickActions = [
@@ -70,23 +148,25 @@ export const DashboardPage = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {stats.map((stat, i) => (
-          <GlassCard key={i} className="flex flex-col gap-3 sm:gap-4 border border-slate-200/80 shadow-sm hover:shadow-lg group transition-all cursor-pointer bg-white">
-            <div className="flex justify-between items-start">
-              <div className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl ${stat.bg} ${stat.color}`}>
-                <stat.icon size={20} className="sm:w-6 sm:h-6" />
+          <Link key={i} to={stat.path} className="text-decoration-none group">
+            <GlassCard className="flex flex-col gap-3 sm:gap-4 border border-slate-200/80 shadow-sm hover:shadow-lg group transition-all cursor-pointer bg-white h-full">
+              <div className="flex justify-between items-start">
+                <div className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl ${stat.bg} ${stat.color}`}>
+                  <stat.icon size={20} className="sm:w-6 sm:h-6" />
+                </div>
+                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                  <ChevronRight size={16} className="text-slate-600" />
+                </div>
               </div>
-              <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                <ChevronRight size={16} className="text-slate-600" />
+              <div>
+                <p className="text-xs text-slate-500 uppercase font-bold tracking-wider">{stat.title}</p>
+                <p className="text-2xl sm:text-3xl font-black mt-1 tracking-tight text-slate-900">{stat.value}</p>
+                <p className="text-xs text-slate-600 mt-1.5 sm:mt-2 font-semibold flex items-center gap-1.5">
+                  <ShieldCheck size={14} className="text-emerald-600" /> {stat.trend}
+                </p>
               </div>
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 uppercase font-bold tracking-wider">{stat.title}</p>
-              <p className="text-2xl sm:text-3xl font-black mt-1 tracking-tight text-slate-900">{stat.value}</p>
-              <p className="text-xs text-slate-600 mt-1.5 sm:mt-2 font-semibold flex items-center gap-1.5">
-                <ShieldCheck size={14} className="text-emerald-600" /> {stat.trend}
-              </p>
-            </div>
-          </GlassCard>
+            </GlassCard>
+          </Link>
         ))}
       </div>
 
@@ -113,19 +193,33 @@ export const DashboardPage = () => {
           </div>
 
           <div className="flex flex-col gap-4 mt-2 sm:mt-4">
-            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">Recent Activity</h2>
+            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900">Account Summary</h2>
             <GlassCard className="p-0 overflow-hidden border-slate-200 shadow-sm bg-white">
                <div className="p-8 sm:p-12 md:p-16 text-center flex flex-col items-center gap-3 sm:gap-4 bg-slate-50/50">
                   <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white shadow-sm flex items-center justify-center">
-                     <Search size={28} className="text-slate-400 sm:w-8 sm:h-8" />
+                     {dues > 0 ? (
+                       <Wallet size={28} className="text-amber-500 sm:w-8 sm:h-8" />
+                     ) : (
+                       <ShieldCheck size={28} className="text-emerald-500 sm:w-8 sm:h-8" />
+                     )}
                   </div>
                   <div>
-                    <h3 className="font-extrabold text-lg sm:text-xl text-slate-900">Cleared for {currentMonth}</h3>
-                    <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1 max-w-sm mx-auto">You have no pending maintenance bills or unresolved complaints this month.</p>
+                    <h3 className="font-extrabold text-lg sm:text-xl text-slate-900">
+                      {dues > 0 ? `Outstanding: ₹ ${dues.toLocaleString()}` : `All Clear for ${currentMonth}`}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1 max-w-sm mx-auto">
+                      {dues > 0 
+                        ? 'You have pending maintenance dues. Click below to view breakdown and pay online.'
+                        : 'Your maintenance dues are fully settled and your resident profile is in good standing.'}
+                    </p>
                   </div>
                   <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-2">
-                    <Link to="/maintenance" className="btn btn-secondary py-2 px-4 sm:px-6 text-xs sm:text-sm font-bold">View Billing</Link>
-                    <Link to="/complaints" className="btn btn-secondary py-2 px-4 sm:px-6 text-xs sm:text-sm font-bold">View Tickets</Link>
+                    <Link to="/maintenance" className="btn btn-primary py-2.5 px-5 sm:px-6 text-xs sm:text-sm font-bold">
+                      {dues > 0 ? 'Pay Maintenance' : 'View Billing'}
+                    </Link>
+                    <Link to="/complaints" className="btn btn-secondary py-2.5 px-5 sm:px-6 text-xs sm:text-sm font-bold">
+                      Support Tickets
+                    </Link>
                   </div>
                </div>
             </GlassCard>
@@ -134,18 +228,39 @@ export const DashboardPage = () => {
 
         <div className="flex flex-col gap-6">
           <h2 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 flex items-center gap-2">
-            <Bell size={20} className="text-blue-600 sm:w-6 sm:h-6" /> Community
+            <Bell size={20} className="text-blue-600 sm:w-6 sm:h-6" /> Community Notices
           </h2>
           <div className="flex flex-col gap-4">
-               <GlassCard className="p-6 sm:p-10 text-center flex flex-col items-center justify-center gap-3 sm:gap-4 border-slate-200 shadow-sm bg-white">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-blue-50 flex items-center justify-center">
-                     <Bell size={22} className="text-blue-400 sm:w-7 sm:h-7" />
-                  </div>
-                  <h4 className="font-extrabold text-slate-900 text-sm sm:text-base">No New Notices</h4>
-                  <p className="text-xs sm:text-sm text-slate-600 font-medium">The society office hasn't posted any new updates today.</p>
-                  <Link to="/notices" className="w-full">
-                    <button className="btn btn-secondary w-full text-xs sm:text-sm font-bold py-2.5">Browse Archives</button>
-                  </Link>
+               <GlassCard className="p-6 sm:p-8 text-left flex flex-col gap-3 sm:gap-4 border-slate-200 shadow-sm bg-white">
+                  {latestNotice ? (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                          latestNotice.priority === 'High' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-blue-50 text-blue-700 border border-blue-200'
+                        }`}>
+                          {latestNotice.priority || 'Notice'}
+                        </span>
+                        <span className="text-[10px] font-bold text-slate-400">
+                          {new Date(latestNotice.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <h4 className="font-extrabold text-slate-900 text-sm sm:text-base line-clamp-1">{latestNotice.title}</h4>
+                      <p className="text-xs sm:text-sm text-slate-600 font-medium line-clamp-3 leading-relaxed">{latestNotice.content}</p>
+                      <Link to="/notices" className="w-full mt-2">
+                        <button className="btn btn-secondary w-full text-xs font-black uppercase tracking-wider py-2.5">
+                          View All ({noticesCount})
+                        </button>
+                      </Link>
+                    </>
+                  ) : (
+                    <div className="text-center py-4 flex flex-col items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
+                        <Bell size={20} className="text-blue-400" />
+                      </div>
+                      <h4 className="font-extrabold text-slate-900 text-sm">No Active Notices</h4>
+                      <p className="text-xs text-slate-600 font-medium">The society office hasn't posted any circulars yet.</p>
+                    </div>
+                  )}
                </GlassCard>
 
                <div className="p-6 sm:p-8 bg-gradient-to-br from-blue-700 to-blue-900 text-white border-none shadow-blue-200 shadow-2xl rounded-3xl sm:rounded-[3rem] relative overflow-hidden group">
