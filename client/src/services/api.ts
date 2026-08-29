@@ -1,4 +1,4 @@
-export const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '') || 'http://localhost:5000';
+export const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '') || (import.meta.env.DEV ? 'http://localhost:5000' : '');
 
 export const resolveApiUrl = (url: string): string => {
   if (url.startsWith('http://localhost:5000')) {
@@ -6,6 +6,9 @@ export const resolveApiUrl = (url: string): string => {
   }
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url;
+  }
+  if (!API_BASE_URL) {
+    return url.startsWith('/') ? url : `/${url}`;
   }
   return `${API_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
 };
